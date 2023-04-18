@@ -49,8 +49,8 @@
 }
 
 .info-body-header{
-   font-weight: bold;
    background-color: var(--color-i-body-header);
+   font-weight: bold;
 }
 
 .info-group-header{
@@ -61,6 +61,8 @@
 
 .info-nested-header{
    background-color: var(--color-i-nested-header);
+   /*font-weight: bold;*/
+   font-style: italic;
 }
 
 .info-table{
