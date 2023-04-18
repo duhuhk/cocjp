@@ -10,9 +10,10 @@ body{
    padding: 5px;
    left: 0;
    background-color: rgb(160,160,160);
-   background-color: rgba(70,70,70,0.4);
+   /*background-color: rgba(70,70,70,0.4);*/
    border-bottom: 2px solid black;
    margin-bottom: 10%;
+   z-index: 2;
 }
 
 .banner-element{
@@ -51,6 +52,9 @@ body{
    background-color: rgb(225,225,225);
    background-color: rgba(70,70,70,0.1);
    padding: 3px;
+}
+.lesson-group:not(:last-child){
+   margin-bottom: 5px;
 }
 
 .lesson-group-text{
