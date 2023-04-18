@@ -1,11 +1,11 @@
 :root{
    --color-bg: rgb(225,225,225);
    --color-banner: rgb(160,160,160);
-   --color-l-base: rgb(225,225,225);
-   --color-l-body: rgba(70,70,70,0.2);
-   --color-l-group: rgba(70,70,70,0.1);
-   --color-l-body-header: rgb(160,190,255);
-   --color-l-group-header: rgb(180,130,255);
+   --color-i-base: rgb(225,225,225);
+   --color-i-body: rgba(70,70,70,0.2);
+   --color-i-group: rgba(70,70,70,0.1);
+   --color-i-body-header: rgb(160,190,255);
+   --color-i-group-header: rgb(180,130,255);
 }
 
 body{
