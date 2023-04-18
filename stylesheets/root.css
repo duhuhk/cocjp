@@ -12,5 +12,6 @@
 
 .banner-element{
    margin: 5px;
-   border-bottom: 5px solid black;
+   border-bottom: 3px solid black;
+   border-radius: 5px;
 }
