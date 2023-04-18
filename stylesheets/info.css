@@ -28,6 +28,14 @@
    margin-bottom: 5px;
 }
 
+.info-content{
+   outline: none;
+   padding: 0;
+   margin: 3px;
+   margin-left: 0;
+   margin-top: 0;
+}
+
 .info-group-text{
    
 }
