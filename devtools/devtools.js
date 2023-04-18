@@ -5,6 +5,7 @@ var workingTable = {
       columnNameSpan: document.querySelector('#name-columns'),
       rowContainter: document.querySelector('#row-cont'),
       dynamicColumnNames: [],
+      dynamicRowData: [],
    },
    _: {
       name: '',
@@ -20,6 +21,9 @@ var workingTable = {
    /*refreshColumnNameField: function(){
       
    },*/
+   createNewRow: function(){
+      
+   },
 };
 
 workingTable.html.nameInput.addEventListener('keyup', e => {
@@ -30,15 +34,20 @@ workingTable.html.columnCountInput.addEventListener('keyup', e => {
    // workingTable.name;
    try{
       let c = Number(workingTable.html.columnCountInput.value);
-      workingTable._.ccnt = c;
-      workingTable._.cols = new Array(c);
+      if(!(c >= 1)){throw 'cant do 0 cols'}
       
-      // Generate/replace column name slots
+      workingTable._.ccnt = c;
+      workingTable._.cols.length = c;
+      
+      // Generate/replace column name slots & row data fields
       workingTable.html.dynamicColumnNames = [];
       workingTable.html.columnNameSpan.innerHTML = 'Col names: ';
       for(let i = 0; i < c; i ++){
          let n = document.createElement('input');
          n.type = 'text';
+         let v = workingTable._.cols[i];
+         console.log(v);
+         n.value = v === undefined ? '' : v;
          let N = i + 1;
          N --;
          n.addEventListener('keyup', f => {
@@ -46,6 +55,9 @@ workingTable.html.columnCountInput.addEventListener('keyup', e => {
          });
          workingTable.html.dynamicColumnNames.push(n);
          workingTable.html.columnNameSpan.appendChild(n);
+         
+         // Create row data entry fields
+         
       }
    }catch(err){
       console.error(err);
