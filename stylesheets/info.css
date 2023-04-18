@@ -85,6 +85,8 @@
    padding-right: 5px;
    text-align: left;
    border-bottom: 1px solid black;
+   /*background-color: rgba(180,255,170,1);*/
+   background-color: var(--color-i-nested-header);
 }
 
 .info-table-data{
@@ -94,5 +96,5 @@
    /*border-bottom: 1px dotted rgb(100,100,100);*/
 }
 .info-table-row:not(:last-child){
-   border-bottom: 1px dotted rgb(100,100,100);
+   border-bottom: 1px dotted rgb(50,50,50);
 }

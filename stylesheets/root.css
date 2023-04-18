@@ -4,9 +4,9 @@
    --color-i-base: rgb(225,225,225);
    --color-i-body: rgba(70,70,70,0.2);
    --color-i-group: rgba(70,70,70,0.1);
-   --color-i-body-header: rgb(160,190,255);
+   --color-i-body-header: rgb(160, 255, 135);
    --color-i-group-header: rgb(180,130,255);
-   --color-i-nested-header: rgb(130, 225, 110);
+   --color-i-nested-header: rgb(160,190,255);
 }
 
 body{
