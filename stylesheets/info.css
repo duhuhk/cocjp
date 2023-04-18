@@ -3,8 +3,8 @@
 }
 
 .info-page-header{
+   display: block;
    margin-top: 4em;
-   display: box;
 }
 
 .info-page-back-link{
