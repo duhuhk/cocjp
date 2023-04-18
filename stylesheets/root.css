@@ -5,16 +5,53 @@
    top: 0;
    padding: 5px;
    left: 0;
-   background-color: rgb(230,230,230);
+   background-color: rgb(160,160,160);
    /*background-color: rgba(0,0,0,0.15);*/
+   border-bottom: 2px solid black;
+   margin-bottom: 10%;
 }
 
 .banner-element{
-   margin: 5px;
+   margin: 7px;
+   padding-bottom: 3px;
    border-bottom: 3px solid black;
-   border-radius: 5px;
+   /*border-radius: 2px;*/
 }
 
 #banner-welcome{
    margin: 0;
+}
+
+.lesson-link{
+   
+}
+
+.lesson-page-header{
+   margin-top: 4em;
+   display: box;
+}
+
+.lesson-page-back-link{
+   font-style: italic;
+}
+
+.lesson-body{
+   outline: 1px solid black;
+   background-color: rgb(225,225,225);
+}
+
+.lesson-group{
+   outline: 1px solid black;
+   background-color: rgb(225,225,225);
+}
+
+.lesson-body-header{
+   width: calc(100% - 10px);
+   margin: 0;
+   padding: 5px;
+   background-color: yellow;
+}
+
+.leesson-group-header{
+   
 }
