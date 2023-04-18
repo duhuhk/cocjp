@@ -22,3 +22,10 @@
 #banner-welcome{
    margin: 0;
 }
+
+#banner-search{
+   padding: 0;
+   float: right;
+   margin: 0;
+   margin-bottom: -14px;
+}
