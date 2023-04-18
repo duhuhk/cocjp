@@ -1,9 +1,11 @@
 #banner{
-   width: 100%;
+   width: calc(100% - 10px);
    height: auto;
    position: fixed;
    top: 0;
+   margin-left: 5px;
    left: 0;
+   background-color: rgba(0,0,0,0.15);
 }
 
 .banner-element{
