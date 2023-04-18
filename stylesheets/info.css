@@ -79,6 +79,12 @@
 .info-table-row{
    
 }
+.info-table-row:nth-child(even){
+   background-color: rgba(100,100,100,0.1);
+}
+.info-table-row:not(:last-child){
+   border-bottom: 1px dotted rgb(50,50,50);
+}
 
 .info-table-header{
    padding-left: 5px;
@@ -94,7 +100,4 @@
    padding-right: 5px;
    text-align: left;
    /*border-bottom: 1px dotted rgb(100,100,100);*/
-}
-.info-table-row:not(:last-child){
-   border-bottom: 1px dotted rgb(50,50,50);
 }
