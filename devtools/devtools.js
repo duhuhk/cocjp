@@ -6,13 +6,13 @@ var workingTable = {
       rowContainer: document.querySelector('#row-cont'),
       tablePreview: document.querySelector('#table-preview'),
       dynamicColumnNames: [],
-      dynamicRowData: [[]],
+      dynamicRowData: [],
    },
    _: {
       name: '',
       ccnt: 1,
       cols: [],
-      rows: [[]],
+      rows: [],
    },
    get name(){
       let n = workingTable.html.nameInput.value;
@@ -35,43 +35,62 @@ var workingTable = {
       d.addEventListener('keyup', e => {
          workingTable._.rows[M][N] = d.value;
       });
+      console.log(d.id);
       d.addEventListener('keydown', e => {
+         document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
+         
          if(e.code == 'Tab'){
             if(N == workingTable._.ccnt){
                workingTable.createNewRow();
             }
          }
-         if(e.code == 'Enter'){
+         if(e.code == 'Enter' || e.code == 'NumpadEnter'){
             workingTable.createNewRow();
+         }
+         
+         if(e.code == 'ArrowUp'){
+            let x = d.id.slice('-')[0];
+            let y = d.id.slice('-')[2];
+            console.log(x, y);
+            if(y > 0) workingTable.html.dynamicRowData[y - 1][x].focus();
          }
       });
       return d;
    },
    createNewRow: function(){
+      workingTable._.rows.push(new Array(workingTable._.ccnt));
       let M = workingTable._.rows.length + 1;
       M -= 2;
-      let row = new Array(workingTable._.ccnt);
+      let rarray = new Array(workingTable._.ccnt);
+      let row = document.createElement('span');
       try{
       for(let i = 0; i < workingTable._.ccnt; i ++){
          let N = i + 1;
          N --;
          let d = workingTable.createDataSlot(M, N);
          
-         let v = workingTable._.rows[M][i];
-         d.value = v === undefined ? '' : v;
+         // let v = workingTable._.rows[M][i];
+         // d.value = v === undefined ? '' : v;
          d.value = '';
-         workingTable.html.rowContainer.appendChild(d);
+         row.appendChild(d);
+         rarray[i] = d;
       }
-      workingTable.html.dynamicRowData.push(row);
+      workingTable.html.rowContainer.appendChild(row);
+      workingTable.html.rowContainer.appendChild(document.createElement('br'));
+      workingTable.html.dynamicRowData.push(rarray);
+      
       }catch(err){console.error(err);}
    },
    refreshRows: function(){
       workingTable.html.rowContainer.innerHTML = '';
+      // workingTable.html.dynamicRowData = [];
       let wdata = (1 / workingTable._.ccnt) * 100;
       let wdatal = `calc(${wdata}% - 6px)`;
       for(let i = 0; i < workingTable._.rows.length; i ++){
-         let row = document.createElement('span');
          workingTable._.rows[i].length = workingTable._.ccnt;
+         workingTable.html.dynamicRowData[i].length = workingTable._.ccnt;
+         let rarray = new Array(workingTable._.ccnt);
+         let row = document.createElement('span');
          for(let j = 0; j < workingTable._.rows[i].length; j ++){
             let N = j + 1;
             N --;
@@ -82,15 +101,14 @@ var workingTable = {
             let v = workingTable._.rows[i][j];
             d.value = v === undefined ? '' : v;
             row.appendChild(d);
+            rarray[j] = d;
          }
-         row.appendChild(document.createElement('br'));
          workingTable.html.rowContainer.appendChild(row);
-         workingTable.html.dynamicRowData.push(row);
+         workingTable.html.rowContainer.appendChild(document.createElement('br'));
+         workingTable.html.dynamicRowData[i] = rarray;
       }
    },
 };
-
-workingTable.createNewRow();
 
 workingTable.html.nameInput.addEventListener('keyup', e => {
    workingTable.name;
@@ -150,3 +168,5 @@ function handleTableColumnInput(){
 }
 
 handleTableColumnInput();
+workingTable.createNewRow();
+document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
