@@ -5,6 +5,7 @@ var workingTable = {
       columnNameSpan: document.querySelector('#name-columns'),
       rowContainer: document.querySelector('#row-cont'),
       tablePreview: document.querySelector('#table-preview'),
+      buildTablePreviewButton: document.querySelector('#build-preview-table'),
       dynamicColumnNames: [],
       dynamicRowData: [],
    },
@@ -24,7 +25,7 @@ var workingTable = {
    },*/
    createDataSlot: function(M, N){
       let wdata = (1 / workingTable._.ccnt) * 100;
-      let wdatal = `calc(${wdata}% - 6px)`;
+      let wdatal = `calc(${wdata}% - 4px)`;
       let d = document.createElement('input');
       d.type = 'text';
       d.id = `${N}-${M}`;
@@ -35,24 +36,39 @@ var workingTable = {
       d.addEventListener('keyup', e => {
          workingTable._.rows[M][N] = d.value;
       });
-      console.log(d.id);
       d.addEventListener('keydown', e => {
+         let x = Number(d.id.split('-')[0]);
+         let y = Number(d.id.split('-')[1]);
          document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
          
          if(e.code == 'Tab'){
-            if(N == workingTable._.ccnt){
+            if(x == workingTable._.ccnt - 1 && y == workingTable._.rows.length - 1){
                workingTable.createNewRow();
             }
          }
-         if(e.code == 'Enter' || e.code == 'NumpadEnter'){
+         if(/*e.code == 'Enter' || */e.code == 'NumpadEnter'){
             workingTable.createNewRow();
+            if(e.shiftKey){
+               workingTable.html.dynamicRowData[y + 1][x].focus();
+               workingTable.html.dynamicRowData[y + 1][x].select();
+            }
          }
          
-         if(e.code == 'ArrowUp'){
-            let x = d.id.slice('-')[0];
-            let y = d.id.slice('-')[2];
-            console.log(x, y);
+         if(e.code == 'ArrowUp' && e.ctrlKey && e.altKey){
             if(y > 0) workingTable.html.dynamicRowData[y - 1][x].focus();
+            if(y > 0) workingTable.html.dynamicRowData[y - 1][x].select();
+         }
+         if(e.code == 'ArrowLeft' && e.ctrlKey && e.altKey){
+            if(x > 0) workingTable.html.dynamicRowData[y][x - 1].focus();
+            if(x > 0) workingTable.html.dynamicRowData[y][x - 1].select();
+         }
+         if(e.code == 'ArrowDown' && e.ctrlKey && e.altKey){
+            if(y < workingTable._.rows.length - 1) workingTable.html.dynamicRowData[y + 1][x].focus();
+            if(y < workingTable._.rows.length - 1) workingTable.html.dynamicRowData[y + 1][x].select();
+         }
+         if(e.code == 'ArrowRight' && e.ctrlKey && e.altKey){
+            if(x < workingTable._.rows[0].length - 1) workingTable.html.dynamicRowData[y][x + 1].focus();
+            if(x < workingTable._.rows[0].length - 1) workingTable.html.dynamicRowData[y][x + 1].select();
          }
       });
       return d;
@@ -84,8 +100,6 @@ var workingTable = {
    refreshRows: function(){
       workingTable.html.rowContainer.innerHTML = '';
       // workingTable.html.dynamicRowData = [];
-      let wdata = (1 / workingTable._.ccnt) * 100;
-      let wdatal = `calc(${wdata}% - 6px)`;
       for(let i = 0; i < workingTable._.rows.length; i ++){
          workingTable._.rows[i].length = workingTable._.ccnt;
          workingTable.html.dynamicRowData[i].length = workingTable._.ccnt;
@@ -107,6 +121,49 @@ var workingTable = {
          workingTable.html.rowContainer.appendChild(document.createElement('br'));
          workingTable.html.dynamicRowData[i] = rarray;
       }
+   },
+   buildTable: function(){
+      let container = document.createElement('span');
+      let group = document.createElement('div');
+      group.classList.add('info-group');
+      let groupHeader = document.createElement('p');
+      groupHeader.classList.add('info-group-header');
+      groupHeader.classList.add('ih');
+      groupHeader.innerHTML = workingTable._.name;
+      group.appendChild(groupHeader);
+      
+      let table = document.createElement('table');
+      table.classList.add('info-table');
+      c = workingTable._.ccnt;
+      let thr = document.createElement('tr');
+      thr.classList.add('info-table-row');
+      for(let i = 0; i < c; i ++){
+         let th = document.createElement('th');
+         th.classList.add('info-table-header');
+         th.innerHTML = workingTable._.cols[i];
+         thr.appendChild(th);
+      }
+      table.appendChild(thr);
+      
+      for(let j = 0; j < workingTable._.rows.length; j ++){
+         let tr = document.createElement('tr');
+         tr.classList.add('info-table-row');
+         for(let i = 0; i < c; i ++){
+            let td = document.createElement('td');
+            td.classList.add('info-table-data');
+            td.innerHTML = workingTable._.rows[j][i];
+            tr.appendChild(td);
+         }
+         table.appendChild(tr);
+      }
+      
+      group.appendChild(table);
+      container.appendChild(group);
+      return group;
+   },
+   generatePreview: function(){
+      workingTable.html.tablePreview.innerHTML = '';
+      workingTable.html.tablePreview.appendChild(workingTable.buildTable());
    },
 };
 
@@ -153,19 +210,14 @@ function handleTableColumnInput(){
       
       // Create row data entry fields
       workingTable.refreshRows();
-      /*for(let j = 0; j < workingTable.html.dynamicRowData.length; j ++){
-         workingTable.html.dynamicRowData[j].length = c;
-         workingTable._.rows[j].length = c;
-      }*/
-      /*workingTable.html.dynamicRowData = [];
-      workingTable._.rows = [];
-      workingTable.createNewRow();*/
    }
    catch(err){
       console.error(err);
-      workingTable.html.columnCountInput.value = '';
+      // workingTable.html.columnCountInput.value = '';
    }
 }
+
+workingTable.html.buildTablePreviewButton.onclick = workingTable.generatePreview;
 
 handleTableColumnInput();
 workingTable.createNewRow();
