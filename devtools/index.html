@@ -26,7 +26,20 @@
       <div class="info-group">
          <p class="ih info-group-header">Make a Table</p>
          <div class="info-content">
-            <label for="table-name">Section name: </label><input id="table-name" type="text">
+            
+            
+         </div>
+         <div class="info-group">
+            <p class="ih info-nested-header">Import from File</p>
+            <label for="import-table">File to import from: </label><input type="file" id="import-table" accept=".txt,.cji" style="font-style: italic;">
+            <br />
+            <button id="process-import-table">Process</button>
+            <hr />
+            <button id="export-table">Export table</button>
+         </div>
+         <div class="info-group">
+            <p class="ih info-nested-header">Table Name</p>
+            <label for="table-name">Name: </label><input id="table-name" type="text">
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Columns</p>
@@ -42,10 +55,10 @@
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Preview</p>
-            <p><button id="build-preview-table">Build preview</button></p>
+            <button id="build-preview-table">Build preview</button>
             <span id="table-preview"></span>
          </div>
-         <p id="dummy"></p>
+         <!--<p id="dummy"></p>-->
       </div>
    </div>
    
