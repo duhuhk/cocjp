@@ -460,15 +460,17 @@ class ImportDataDefault{
 const importDataDefaultTypeColumns = new ImportDataDefault({
    __family__: {
       'dictionary_verb': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{u-/ru-verb}s{u}>4<n{{particle(s)}}s{{p}}>5<n{{lesson #}}s{{l}}>',
+      'dictionary_adjective': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{i-/na-/no-adjective}s{u}>4<n{{lesson #}}s{{l}}>',
       'dictionary_hasParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{particle(s)}}s{{p}}>4<n{{lesson #}}s{{l}}>',
+      'dictionary_basic': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
       'dictionary_noParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
    },
    'dictionary': ['dictionary_noParticle'],
-   'dictionary-adjective': ['dictionary_hasParticle'],
-   'dictionary-noun': ['dictionary_noParticle'],
+   'dictionary-adjective': ['dictionary_adjective'],
+   'dictionary-noun': ['dictionary_basic'],
    'dictionary-verb': ['dictionary_verb'],
-   'dictionary-a': ['dictionary_hasParticle'],
-   'dictionary-n': ['dictionary_noParticle'],
+   'dictionary-a': ['dictionary_adjective'],
+   'dictionary-n': ['dictionary_basic'],
    'dictionary-v': ['dictionary_verb'],
 });
 /*const importDataDefaultTypeColumns = {
