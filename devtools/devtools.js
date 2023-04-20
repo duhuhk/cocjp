@@ -415,9 +415,11 @@ async function processImportDataTable(){
    */
    workingTable.html.nameInput.value = pd.meta.title;
    workingTable.html.columnCountInput.value = pd.xpol.ccnt;
+   handleTableColumnInput();
    for(let cname = 0; cname < workingTable.html.dynamicColumnNames.length; cname ++){
-      workingTable.html.dynamicColumnNames[cname].value = pd.xpol.cols[cname];
       workingTable._.cols[cname] = pd.xpol.cols[cname];
+      workingTable.html.dynamicColumnNames[cname].value = pd.xpol.cols[cname];
+      handleTableColumnInput();
    }
    workingTable.html.rowContainer.innerHTML = '';
    workingTable.html.dynamicRowData = [];
@@ -425,7 +427,6 @@ async function processImportDataTable(){
    for(let r = 0; r < pd.xpol.rcnt; r ++){
       workingTable.createNewRow();
    }
-   handleTableColumnInput();
    for(let j = 0; j < pd.xpol.rcnt; j ++){
       for(let i = 0; i < pd.xpol.ccnt; i ++){
          let mask = pd.xpol.rows[j][i].length == 1 ? pd.xpol.rows[j][i][0] : pd.xpol.rows[j][i].join('`/<n>');
