@@ -7,6 +7,7 @@ var workingTable = {
       tablePreview: document.querySelector('#table-preview'),
       buildTablePreviewButton: document.querySelector('#build-preview-table'),
       outputTableButton: document.querySelector('#output-table-html'),
+      outputTableExtraTabs: document.querySelector('#extra-tab-table-output'),
       tableImportFile: document.querySelector('#import-table'),
       tableImportConfirm: document.querySelector('#process-import-table'),
       tableExport: document.querySelector('#export-table'),
@@ -23,8 +24,8 @@ var workingTable = {
       importData: {
          library: 'dictionary-table',
          libraryFull: 'importDataDefaultLibrary_dictionaryTable',
-         sublibrary: 'default',
-         isDevTool: false,
+         type: 'default',
+         isDevTool: true,
       },
    },
    get name(){
@@ -150,6 +151,9 @@ var workingTable = {
       let container = document.createElement('span');
       let group = document.createElement('div');
       group.classList.add('info-group');
+      group.setAttribute('data-dt-library', workingTable._.importData.libraryFull + ' [' + workingTable._.importData.library + ']');
+      group.setAttribute('data-dt-type', workingTable._.importData.type);
+      group.setAttribute('data-dt-export', workingTable._.importData.isDevTool);
       let groupHeader = document.createElement('p');
       groupHeader.classList.add('info-group-header');
       groupHeader.classList.add('ih');
@@ -183,7 +187,7 @@ var workingTable = {
       
       group.appendChild(table);
       container.appendChild(group);
-      return group;
+      return container;
    },
    generatePreview: function(){
       workingTable.html.tablePreview.innerHTML = '';
@@ -251,13 +255,43 @@ workingTable.createNewRow();
 // document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
 
 function outputTableHTML(){
-   let xpoBreak = /(?<=\<(?<ttable>table)(?=\s).*?\>)(?<=\<(?<tag>\w+)(?=\s).*?\>)(?![^\<]+)(?!\<\/\k<tag>)(?!\<\/\k<ttable>|$)/gm;
-   let xpoTHead = /(?<=\t\<(?<outtag>\w+(?=\s))[^\<]*?\n)^(?!\<\/*\k<outtag>(?=\s))/gm;
-   let xpoTTail = /(?<=^\t(?<otab>\t*)\<(?<tag>\w+(?=\s))[^]*?)(?=\k<otab>\<\k<tag>)/gm;
-   let xpoTBack = /(?<=^\<(?<tag>\w+(?=\s))[^]*)(?=\<\/\k<tag>)/gm;
-   let xpoTable = workingTable.buildTable('default');
-   // document.getElementById('dummy').innerText = ;
+   let tabExtra = 0;
+   if(+workingTable.html.outputTableExtraTabs.value > 0){
+      tabExtra = +workingTable.html.outputTableExtraTabs.value;
+   }
+   tabExtra ++;
+   let xpoTable = workingTable.buildTable('default').innerHTML;
+   xpoTable = xpoTable.replace(/(?<=^.*?\<(?<p>p(?=\s)).*?\<\/(\k<p>).*?\>)(?=\<(?<table>table))/, '\n');
+   xpoTable = xpoTable.replace(/(?<=^.*?\<(?<div>div(?=\s)).*?\>)(?=\<(?<p>p))/, '\n');
+   xpoTable = xpoTable.replace(/(?<=\<(?<ttable>table)(?=\s).*?\>)(?<=\<(?<tag>\w+)(?=\s).*?\>)(?![^\<]+)(?!\<\/\k<tag>)(?!$)/gm, '\n\t');
+   xpoTable = xpoTable.replace(/(?<=\t\<(?<outtag>\w+(?=\s))[^\<]*?\n)^(?!\<\/*\k<outtag>(?=\s))/gm, '\t');
+   xpoTable = xpoTable.replace(/(?<=^\t(?<otab>\t*)\<(?<tag>\w+(?=\s))[^]*?)(?=\k<otab>\<\k<tag>)/gm, '\t');
+   xpoTable = xpoTable.replace(/(?<=^\<(?<tag>\w+(?=\s))[^]*)(?=\<\/\k<tag>)/gm, '');
+   // I used to like regex
+   xpoTable = xpoTable.split('\t').join('℣');               // Whatever ℣ is is my stand in for tabs
+   xpoTable = xpoTable.split('\n');
+   let tabs = [];
+   for(let inefficient = 0; inefficient < tabExtra; inefficient++){
+      tabs.push('℣');
+   }
+   tabs = tabs.join('');
+   xpoTable.forEach((l, i) => {
+      xpoTable[i] = tabs + xpoTable[i];
+   })
+   xpoTable[0] = xpoTable[0].substring(1);
+   xpoTable[xpoTable.length - 2] = xpoTable[xpoTable.length - 2].substring(1);
+   xpoTable[xpoTable.length - 1] = xpoTable[xpoTable.length - 1].substring(2);
+   
+   console.group('Table HTML output');
+   console.log(xpoTable);
+   console.groupEnd();
+   for(let line of xpoTable){
+      document.getElementById('dummy').appendChild(document.createElement('br'));
+      document.getElementById('dummy').appendChild(document.createTextNode(line));
+   }
+   // document.getElementById('dummy').appendChild(document.createTextNode('a'));
 }
+workingTable.html.outputTableButton.addEventListener('click', outputTableHTML);
 
 async function processImportDataTable(){
    let data = await workingTable.html.tableImportFile.files[0].text();
@@ -286,7 +320,7 @@ async function processImportDataTable(){
          cjiversion: cjiver,
          title: '',
          lib: '',
-         subl: '',
+         type: '',
          cols: [],
       },
    };
@@ -301,9 +335,18 @@ async function processImportDataTable(){
       up.meta = data.match(meta)[0];
    }
    let d_meta = up.meta;
-   let libPing = 'table';
-   let backupLibPing = 'importDataDefaultLibrary_dictionaryTable';
-   let library = 'a'
+   
+   let libPing = workingTable._.importData.library;
+   let backupLibPing = workingTable._.importData.libraryFull;
+   let typePing = workingTable._.importData.type;
+   let getLib = new CJIReader('lib', ['{', '}'], cjiver);
+   let getFullLib = new CJIReader('libfull', ['{', '}'], cjiver);
+   let getType = new CJIReader('type', ['{', '}'], cjiver);
+   libPing = getLib.test(d_meta) ? getLib.pull(d_meta) : libPing;
+   backupLibPing = getFullLib.test(d_meta) ? getFullLib.pull(d_meta) : backupLibPing;
+   typePing = getType.test(d_meta) ? getType.pull(d_meta) : typePing;
+   let library = pokeLibrary(libPing, backupLibPing, workingTable._.importData.library, workingTable._.importData.libraryFull);
+   
    let checkForOverride = /(?<=use-default\{).*?(?=\})/gm;
    let m_default = checkForOverride.test(d_meta) ? /true|1/gmi.test(d_meta.match(checkForOverride)[0]) : true;
    /*
@@ -334,29 +377,30 @@ async function processImportDataTable(){
    }
    
    // Parsed data
-   let dp_title, dp_subl, dp_col;
+   let dp_title, dp_lib, dp_type, dp_col;
    pd.xpol.rcnt = d_rows.length;
    let title = /(?<=title(?<!\\)\{).*?(?=(?<!\\)\})/;
    if(title.test(d_meta)){
       dp_title = d_meta.match(title)[0];
       pd.meta.title = dp_title;
    }
-   let subl = /(?<=subl(?<!\\)\{).*?(?=(?<!\\)\})/;
-   if(subl.test(d_meta)){
-      dp_subl = d_meta.match(subl)[0];
-      pd.meta.subl = dp_subl;
+   let type = /(?<=type(?<!\\)\{).*?(?=(?<!\\)\})/;
+   if(type.test(d_meta)){
+      dp_type = d_meta.match(type)[0];
+      pd.meta.type = dp_type;
    }
+   // console.log('type ', dp_type);
    // Override explicit columns with default, if found
    let cjiver_columns = cjiver;
    let usecols = d_cols;
-   if(Object.keys(importDataDefaultLibrary_dictionaryTable).includes(pd.meta.subl) && m_default){
+   if(Object.keys(importDataDefaultLibrary_dictionaryTable).includes(pd.meta.type) && m_default){
       cjiver_columns = '0';
-      d_cols = importDataDefaultLibrary_dictionaryTable[pd.meta.subl];
-      up.cols = importDataDefaultLibrary_dictionaryTable[pd.meta.subl];
-      usecols = importDataDefaultLibrary_dictionaryTable[pd.meta.subl];
-      console.log('Using default column layout for ' + pd.meta.subl);
+      d_cols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
+      up.cols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
+      usecols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
+      console.log('Using default column layout for ' + pd.meta.type);
    }
-   console.log('cji version: ', cjiver);
+   // console.log('cji version: ', cjiver);
    let colp = /\d\<.*?\>/mg;
    /*let colpnest;
    switch(cjiver_columns){
@@ -401,21 +445,37 @@ async function processImportDataTable(){
       }
       // rowSplit[pd.meta.cols[i].s].fill((new Array(pd.xpol.ccnt)).fill('', 0), 0);
    }
-   // console.log(rowSplit);
+   // console.log('rowSplit ', rowSplit);
+   let dataLost = [];
    for(let j = 0; j < d_rows.length; j ++){
       let rowHand = [...d_rows[j].matchAll(rowp)];
-      // console.log(rowHand);
+      // console.log('rowHand ', rowHand);
       let curRow = new Array(pd.xpol.ccnt);
       for(let k = 0; k < pd.xpol.ccnt; k ++){
          curRow[k] = [];
       }
       for(let rowDat of rowHand){
+         if(pd.xpol.take.indexOf(rowDat[1]) < 0){
+            dataLost.push({
+               tag: rowDat[1],
+               'tag index': pd.xpol.take.indexOf(rowDat[1]),
+               'tag value': rowDat[0]
+            });
+            continue;
+         }
          // console.log(rowDat[1], pd.xpol.take.indexOf(rowDat[1]), curRow);
          curRow[pd.xpol.take.indexOf(rowDat[1])].push(rowDat[0]);
       }
       pd.xpol.rows[j] = curRow;
    }
-   // console.log(rowSplit);
+   if(dataLost.length > 0){
+      console.group('Data lost in import');
+      console.warn('Invalid tags! Ignored the following data:')
+      console.table(dataLost);
+      console.table(pd.meta.cols);
+      console.groupEnd();
+   }
+   // console.log('rowSplit ', rowSplit);
    
    // Update HTML to show new table input
    /*
@@ -459,7 +519,7 @@ workingTable.html.tableImportConfirm.addEventListener('click', processImportData
 
 // Instead of an ignore function, just use a CJIReader to cut out unwanted parts
 class CJIReader extends RegExp{
-   constructor(tag, bracket, flag = 'mg', version, /*ignore = [{}], escape = '`/'*/){
+   constructor(tag, bracket, version, flag = 'mg'/*, ignore = [{}], escape = '`/'*/){
       // /(?<=cols(?<!(?<!\\)\{)(?<!\\)\{(?!\{)).*?(?=(?<!(?<!\\)\})(?<!\\)\}(?!(?<!\\)\}))/mg;
       // /(?<=cols(?<!\\)\{).*?(?=(?<=\}[^\{]*)\})/mg;
       // /(?<=(?<colID>\w+)\{).*?(?=\})/gm
@@ -473,7 +533,7 @@ class CJIReader extends RegExp{
       
       // return this.RegExp;
       
-      let re_argument = `(?<=${tag}(?<!(?<!\\\\)\\${lbra})(?<!\\\\)\\${lbra}(?!\\${lbra})).*?(?=(?<!(?<!\\\\)\\${rbra})(?<!\\\\)\\${rbra}(?!(?<!\\\\)\\${rbra}))`
+      let re_argument = `(?<=(?<!\\w)${tag}(?<!(?<!\\\\)\\${lbra})(?<!\\\\)\\${lbra}(?!\\${lbra})).*?(?=(?<!(?<!\\\\)\\${rbra})(?<!\\\\)\\${rbra}(?!(?<!\\\\)\\${rbra}))`
       // let re_argument = `(?<=${tag}(?<!\\\\)\\${lbra}).*?(?=(?<=\\${rbra}[^\\${lbra}]*)\\${rbra})`;
       // let re_argument = `(?<=(${tag})\\${lbra}).*?(?=\\${rbra})`;
       let re = new RegExp(re_argument, flag);
@@ -525,10 +585,6 @@ class CJIReader extends RegExp{
    }
 }
 
-function fuckyou(tag, bracket, flag = 'mg', version){
-   
-}
-
 class ImportDataLibrary{
    constructor(defaultSet){
       this.__family__ = defaultSet.__family__;
@@ -560,9 +616,10 @@ const importDataDefaultLibrary_dictionaryTable = new ImportDataLibrary({
       'dictionary_hasParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{particle(s)}}s{{p}}>4<n{{lesson #}}s{{l}}>',
       'dictionary_basic': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
       'dictionary_noParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
+      'dictionary_all': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{type}s{u}>4<n{{particle(s)}}s{{p}}>5<n{{lesson #}}s{{l}}>'
    },
-   'default': ['dictionary_basic'],
-   'dictionary': ['dictionary_noParticle'],
+   'default': ['dictionary_all'],
+   'dictionary': ['dictionary_all'],
    'dictionary-adjective': ['dictionary_adjective'],
    'dictionary-noun': ['dictionary_basic'],
    'dictionary-verb': ['dictionary_verb'],
@@ -574,6 +631,16 @@ const importDataDefaultLibrary_dictionaryTable = new ImportDataLibrary({
 const libraryLibrary = {
    'default': 'importDataDefaultLibrary_default',
    'dictionary-table': 'importDataDefaultLibrary_dictionaryTable',
+}
+function pokeLibrary(s, f, ds, df, onfail = 'default'){
+   // d_ = default _
+   let shrtLib = Object.keys(libraryLibrary);
+   let fullLib = Object.values(libraryLibrary);
+   if(shrtLib.includes(s)){ return libraryLibrary[s]; }
+   if(fullLib.includes(f)){ return libraryLibrary[shrtLib[fullLib.indexOf(f)]]; }
+   if(shrtLib.includes(ds)){ return libraryLibrary[ds]; }
+   if(shrtLib.includes(df)){ return libraryLibrary[shrtLib[fullLib.indexOf(df)]]; }
+   return libraryLibrary[onfail] ?? libraryLibrary['default'];
 }
 
 

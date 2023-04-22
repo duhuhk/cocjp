@@ -1,5 +1,5 @@
 cjiver[1]
-m[title{U-Verbs}lib{dictionary-table}libfull{importDataDefaultLibrary_dictionaryTable}sublib{dictionary-v}cols{0<n{kanji}s{k}>1<n{reading(s)}s{r}>2<n{meaning}s{d}>3<n{particle(s)}s{p}>4<n{lesson #}s{l}>}]
+m[title{U-Verbs}lib{dictionary-table}libfull{importDataDefaultLibrary_dictionaryTable}type{dictionary-v}cols{0<n{kanji}s{k}>1<n{reading(s)}s{r}>2<n{meaning}s{d}>3<n{particle(s)}s{p}>4<n{lesson #}s{l}>}]
 [d{To go (destination)}r{いく}u{u-verb}]
 [d{To go back`/<n>To return}r{かえる}u{u-verb}]
 [d{To listen`/<n>To hear}r{きく}u{u-verb}]
