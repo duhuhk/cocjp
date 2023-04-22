@@ -1,6 +1,8 @@
 # ignore devspace stuff that doesn't need to be on the server
 ./devspace/notes
+./devspace/notes/*
 ./devspace/old
+./devspace/old/*
 # ./devspace/import-data/[something something outdated or corrected - maybe just move into ../old/ tho]
 
 # ignore random txts
