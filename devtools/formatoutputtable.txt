@@ -1,0 +1,28 @@
+-=NOTE TO SELF=-
+  FUCK RegExp
+  only use the first of each section
+
+
+   BREAK [uses replace -> \n\t]
+/(?<=\<(?<ttable>table)(?=\s).*?\>)(?<=\<(?<tag>\w+)(?=\s).*?\>)(?![^\<]+)(?!\<\/\k<tag>)(?!\<\/\k<ttable>|$)/gm
+   tabs all but <table ...> tag
+               OR
+            /(?<=\<(?<ttable>table)(?=\s).*?\>)(?<=\<(?<tag>\w+)(?=\s).*?\>)(?![^\<]+)(?!\<\/\k<tag>)(?!$)/gm
+               2nd also \n\t's the last </table> for the final step to fix
+
+   THEAD [uses replace -> \t]
+/(?<=\t\<(?<outtag>\w+(?=\s))[^\<]*?\n)^(?!\<\/*\k<outtag>(?=\s))/gm
+   tabs all tabbed lines with an element opening statement (no </...>) that are different to the one above them
+
+   TTAIL [uses replace -> \t]
+/(?<=^\t(?<otab>\t*)\<(?<tag>\w+(?=\s))[^]*?)(?=\k<otab>\<\k<tag>)/gm
+   makes all lines with an element opening statement match tabulation of a line of same element above
+               OR
+            /(?<=^(?<otab>\t+)\<(?<tag>\w+(?=\s)).*?\n^)(?!\k<otab>)(?=\t*\<\k<tag>)/gm
+            /(?<=^(?<otab>\t*(?!\t))\<(?<tag>\w+(?=\s))[^]*?^)(?<=(?<!\t)\t*)((?!\k<otab>)(?=.*?\<))(?=\t*\<\k<tag>)/gm
+               does the same thing, but can be iterated to meet a specific indentation
+               MUST use in a while loop
+
+   TBACK [uses replace -> (empty str)]
+/(?<=^\<(?<tag>\w+(?=\s))[^]*)(?=\<\/\k<tag>)/gm
+   only fixes whatever tag starts the entire thing bc im fucking sick of regexp its been 5 bloody hours

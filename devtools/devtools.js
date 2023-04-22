@@ -6,6 +6,7 @@ var workingTable = {
       rowContainer: document.querySelector('#row-cont'),
       tablePreview: document.querySelector('#table-preview'),
       buildTablePreviewButton: document.querySelector('#build-preview-table'),
+      outputTableButton: document.querySelector('#output-table-html'),
       tableImportFile: document.querySelector('#import-table'),
       tableImportConfirm: document.querySelector('#process-import-table'),
       tableExport: document.querySelector('#export-table'),
@@ -19,6 +20,12 @@ var workingTable = {
       ccnt: 1,
       cols: [],
       rows: [],
+      importData: {
+         library: 'dictionary-table',
+         libraryFull: 'importDataDefaultLibrary_dictionaryTable',
+         sublibrary: 'default',
+         isDevTool: false,
+      },
    },
    get name(){
       let n = workingTable.html.nameInput.value;
@@ -243,6 +250,15 @@ handleTableColumnInput();
 workingTable.createNewRow();
 // document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
 
+function outputTableHTML(){
+   let xpoBreak = /(?<=\<(?<ttable>table)(?=\s).*?\>)(?<=\<(?<tag>\w+)(?=\s).*?\>)(?![^\<]+)(?!\<\/\k<tag>)(?!\<\/\k<ttable>|$)/gm;
+   let xpoTHead = /(?<=\t\<(?<outtag>\w+(?=\s))[^\<]*?\n)^(?!\<\/*\k<outtag>(?=\s))/gm;
+   let xpoTTail = /(?<=^\t(?<otab>\t*)\<(?<tag>\w+(?=\s))[^]*?)(?=\k<otab>\<\k<tag>)/gm;
+   let xpoTBack = /(?<=^\<(?<tag>\w+(?=\s))[^]*)(?=\<\/\k<tag>)/gm;
+   let xpoTable = workingTable.buildTable('default');
+   // document.getElementById('dummy').innerText = ;
+}
+
 async function processImportDataTable(){
    let data = await workingTable.html.tableImportFile.files[0].text();
    
@@ -269,7 +285,8 @@ async function processImportDataTable(){
       meta: {
          cjiversion: cjiver,
          title: '',
-         type: '',
+         lib: '',
+         subl: '',
          cols: [],
       },
    };
@@ -284,15 +301,11 @@ async function processImportDataTable(){
       up.meta = data.match(meta)[0];
    }
    let d_meta = up.meta;
+   let libPing = 'table';
+   let backupLibPing = 'importDataDefaultLibrary_dictionaryTable';
+   let library = 'a'
    let checkForOverride = /(?<=use-default\{).*?(?=\})/gm;
    let m_default = checkForOverride.test(d_meta) ? /true|1/gmi.test(d_meta.match(checkForOverride)[0]) : true;
-   /*let m_default;
-   if(checkForOverride.test(d_meta)){
-      let gos = d_meta.match(checkForOverride)[0];
-      if(/(true|1)/gmi.test(gos)){
-         m_default = true;
-      }
-   }*/
    /*
       Columns format by cji version:
         version  |  formatting notes
@@ -321,27 +334,27 @@ async function processImportDataTable(){
    }
    
    // Parsed data
-   let dp_title, dp_type, dp_col;
+   let dp_title, dp_subl, dp_col;
    pd.xpol.rcnt = d_rows.length;
    let title = /(?<=title(?<!\\)\{).*?(?=(?<!\\)\})/;
    if(title.test(d_meta)){
       dp_title = d_meta.match(title)[0];
       pd.meta.title = dp_title;
    }
-   let type = /(?<=type(?<!\\)\{).*?(?=(?<!\\)\})/;
-   if(type.test(d_meta)){
-      dp_type = d_meta.match(type)[0];
-      pd.meta.type = dp_type;
+   let subl = /(?<=subl(?<!\\)\{).*?(?=(?<!\\)\})/;
+   if(subl.test(d_meta)){
+      dp_subl = d_meta.match(subl)[0];
+      pd.meta.subl = dp_subl;
    }
    // Override explicit columns with default, if found
    let cjiver_columns = cjiver;
    let usecols = d_cols;
-   if(Object.keys(importDataDefaultTypeColumns).includes(pd.meta.type) && m_default){
+   if(Object.keys(importDataDefaultLibrary_dictionaryTable).includes(pd.meta.subl) && m_default){
       cjiver_columns = '0';
-      d_cols = importDataDefaultTypeColumns[pd.meta.type];
-      up.cols = importDataDefaultTypeColumns[pd.meta.type];
-      usecols = importDataDefaultTypeColumns[pd.meta.type];
-      console.log('Using default column layout for ' + pd.meta.type);
+      d_cols = importDataDefaultLibrary_dictionaryTable[pd.meta.subl];
+      up.cols = importDataDefaultLibrary_dictionaryTable[pd.meta.subl];
+      usecols = importDataDefaultLibrary_dictionaryTable[pd.meta.subl];
+      console.log('Using default column layout for ' + pd.meta.subl);
    }
    console.log('cji version: ', cjiver);
    let colp = /\d\<.*?\>/mg;
@@ -444,7 +457,79 @@ async function processImportDataTable(){
 }
 workingTable.html.tableImportConfirm.addEventListener('click', processImportDataTable);
 
-class ImportDataDefault{
+// Instead of an ignore function, just use a CJIReader to cut out unwanted parts
+class CJIReader extends RegExp{
+   constructor(tag, bracket, flag = 'mg', version, /*ignore = [{}], escape = '`/'*/){
+      // /(?<=cols(?<!(?<!\\)\{)(?<!\\)\{(?!\{)).*?(?=(?<!(?<!\\)\})(?<!\\)\}(?!(?<!\\)\}))/mg;
+      // /(?<=cols(?<!\\)\{).*?(?=(?<=\}[^\{]*)\})/mg;
+      // /(?<=(?<colID>\w+)\{).*?(?=\})/gm
+      let temp = {};
+      temp.cjiVersion = version;
+      temp.RegExp = new RegExp('');
+      let lbra, rbra;
+      lbra = bracket[0];
+      rbra = bracket[1];
+      // this.RegExp = new RegExp(`(?<=cols(?<!(?<!\\)\{)(?<!\\)\{(?!\{)).*?(?=(?<!(?<!\\)\})(?<!\\)\}(?!(?<!\\)\}))`, flag);
+      
+      // return this.RegExp;
+      
+      let re_argument = `(?<=${tag}(?<!(?<!\\\\)\\${lbra})(?<!\\\\)\\${lbra}(?!\\${lbra})).*?(?=(?<!(?<!\\\\)\\${rbra})(?<!\\\\)\\${rbra}(?!(?<!\\\\)\\${rbra}))`
+      // let re_argument = `(?<=${tag}(?<!\\\\)\\${lbra}).*?(?=(?<=\\${rbra}[^\\${lbra}]*)\\${rbra})`;
+      // let re_argument = `(?<=(${tag})\\${lbra}).*?(?=\\${rbra})`;
+      let re = new RegExp(re_argument, flag);
+      temp.RegExp = re;
+      
+      super(re_argument, flag);
+      
+      Object.assign(this, temp);
+   }
+   
+   pull(str){
+      return str.match(this);
+   }
+   
+   [Symbol.pullCJIData](str){
+      /*String.prototype.pullCJIData = function(e){
+         let temp = Array.from(this).join('');
+         console.log(temp);
+         return e[Symbol.pullCJIData](temp);
+      }*/
+      return str.match(this);
+   }
+   
+   // Dunno why, but supering alone doesn't fix all RegExp things
+   // v This is a wworkaround
+   [Symbol.match](str){
+      return RegExp.prototype[Symbol.match].call(this, str);
+   }
+   [Symbol.matchAll](str){
+      return RegExp.prototype[Symbol.matchAll].call(this, str);
+   }
+   [Symbol.replace](str, rpl){
+      return RegExp.prototype[Symbol.replace].call(this, str, rpl);
+   }
+   [Symbol.search](str){
+      return RegExp.prototype[Symbol.search].call(this, str);
+   }
+   [Symbol.split](str, lim){
+      return RegExp.prototype[Symbol.split].call(this, str, lim);
+   }
+   get [Symbol.valueOf](){
+      return this.RegExp.__proto__.valueOf;
+   }
+   
+   // Doubt I'll ever need this but
+   // ooh shiny
+   get [Symbol.toStringTag]() {
+      return 'CJIReader';
+   }
+}
+
+function fuckyou(tag, bracket, flag = 'mg', version){
+   
+}
+
+class ImportDataLibrary{
    constructor(defaultSet){
       this.__family__ = defaultSet.__family__;
       for(let def in defaultSet){
@@ -457,8 +542,18 @@ class ImportDataDefault{
          }
       }
    }
+   
+   get [Symbol.toStringTag]() {
+      return 'CJIDataLibrary';
+   }
 }
-const importDataDefaultTypeColumns = new ImportDataDefault({
+const importDataDefaultLibrary_default = new ImportDataLibrary({
+   __family__: {
+      'default': '0<n{{\\s}}s{{0}}>1<n{{\\s}}s{{1}}>2<n{{\\s}}s{{2}}>',
+   },
+   'default': ['default'],
+});
+const importDataDefaultLibrary_dictionaryTable = new ImportDataLibrary({
    __family__: {
       'dictionary_verb': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{u-/ru-verb}s{u}>4<n{{particle(s)}}s{{p}}>5<n{{lesson #}}s{{l}}>',
       'dictionary_adjective': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{i-/na-/no-adjective}s{u}>4<n{{lesson #}}s{{l}}>',
@@ -466,6 +561,7 @@ const importDataDefaultTypeColumns = new ImportDataDefault({
       'dictionary_basic': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
       'dictionary_noParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
    },
+   'default': ['dictionary_basic'],
    'dictionary': ['dictionary_noParticle'],
    'dictionary-adjective': ['dictionary_adjective'],
    'dictionary-noun': ['dictionary_basic'],
@@ -474,17 +570,17 @@ const importDataDefaultTypeColumns = new ImportDataDefault({
    'dictionary-n': ['dictionary_basic'],
    'dictionary-v': ['dictionary_verb'],
 });
-/*const importDataDefaultTypeColumns = {
-   __family__: {
-      'dictionary_verb': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{u-/ru-verb}s{u}>4<n{{particle(s)}}s{{p}}>5<n{{lesson #}}s{{l}}>',
-      'dictionary_hasParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{particle(s)}}s{{p}}>4<n{{lesson #}}s{{l}}>',
-      'dictionary_noParticle': '0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{lesson #}}s{{l}}>',
-   },
-   'dictionary': importDataDefaultTypeColumns.__family__['dictionary_noParticle'],
-   'dictionary-adjective': importDataDefaultTypeColumns.__family__['dictionary_hasParticle'],
-   'dictionary-noun': importDataDefaultTypeColumns.__family__['dictionary_noParticle'],
-   'dictionary-verb': importDataDefaultTypeColumns.__family__['dictionary_verb'],
-   'dictionary-a': importDataDefaultTypeColumns.__family__['dictionary_hasParticle'],
-   'dictionary-n': importDataDefaultTypeColumns.__family__['dictionary_noParticle'],
-   'dictionary-v': importDataDefaultTypeColumns.__family__['dictionary_verb'],
-};*/
+
+const libraryLibrary = {
+   'default': 'importDataDefaultLibrary_default',
+   'dictionary-table': 'importDataDefaultLibrary_dictionaryTable',
+}
+
+
+// I don't give a shit if this is good practice or not
+// It somehow does what I want it to so it stays
+String.prototype.pullCJIData = function(e){
+   let temp = Array.from(this).join('');
+   // console.log(temp);
+   return e[Symbol.pullCJIData](temp);
+}
