@@ -16,7 +16,7 @@
          <a class="banner-element" href="https://duhuhk.github.io/cocjp/chapters/">Lessons</a>
          <a class="banner-element" href="https://duhuhk.github.io/cocjp/banner_other/">Other</a>
          
-         <span id="banner-search" class="banner-element"><label for="page-search">Search: </label><input id="page-search" type='text'></span>
+         <span id="banner-search" class="banner-element"><label for="page-search">Search: </label><input id="page-search" type="text"></span>
       </span>
    </div>
    
@@ -36,11 +36,26 @@
             <br />
             <button id="process-import-table">Process (click twice)</button>
             <hr />
-            <button id="export-table">Export table</button>
+            <button id="export-table">Export table as .cji</button>
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Table Name</p>
             <label for="table-name">Name: </label><input id="table-name" type="text">
+         </div>
+         <div class="info-group">
+            <p class="ih info-nested-header">Table Meta</p>
+            <label style="position: absolute;" for="table-meta-library">library: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-library" type="text">
+            <br />
+            <label style="position: absolute;" for="table-meta-libraryFull">libraryFull: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-libraryFull" type="text">
+            <br />
+            <label style="position: absolute;" for="table-meta-type">type: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-type" type="text">
+            <br />
+            <label style="position: absolute;" for="table-meta-isDevTool">isDevTool: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-isDevTool" type="text">
+            <br />
+            <label style="position: absolute;" for="table-meta-isCustom">isCustom: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-isCustom" type="text"><br />
+            <label style="position: absolute;" for="table-meta-customLibrary">customLibrary: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-customLibrary" type="text">
+            <br />
+            <label style="position: absolute;" for="table-meta-cjiVer">cjiVer: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-cjiVer" type="text">
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Columns</p>

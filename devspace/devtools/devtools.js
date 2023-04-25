@@ -11,6 +11,13 @@ var workingTable = {
       tableImportFile: document.querySelector('#import-table'),
       tableImportConfirm: document.querySelector('#process-import-table'),
       tableExport: document.querySelector('#export-table'),
+      metaLibrary: document.querySelector('#table-meta-library'),
+      metaLibraryFull: document.querySelector('#table-meta-libraryFull'),
+      metaType: document.querySelector('#table-meta-type'),
+      metaIsDevTool: document.querySelector('#table-meta-isDevTool'),
+      metaIsCustom: document.querySelector('#table-meta-isCustom'),
+      metaCustomLibrary: document.querySelector('#table-meta-customLibrary'),
+      metaCJIVer: document.querySelector('#table-meta-cjiVer'),
       dynamicColumnNames: [],
       dynamicRowData: [],
       showImportPreview: false,
@@ -26,12 +33,33 @@ var workingTable = {
          libraryFull: 'importDataDefaultLibrary_dictionaryTable',
          type: 'default',
          isDevTool: true,
+         isCustom: false,
+         customLibrary: false,
+         cjiVer: 1,
       },
    },
    get name(){
       let n = workingTable.html.nameInput.value;
       workingTable._.name = n;
       return n;
+   },
+   updateMetaMonitor: function(){
+      workingTable.html.metaLibrary.value = workingTable._.importData.library;
+      workingTable.html.metaLibraryFull.value = workingTable._.importData.libraryFull;
+      workingTable.html.metaType.value = workingTable._.importData.type;
+      workingTable.html.metaIsDevTool.value = workingTable._.importData.isDevTool;
+      workingTable.html.metaIsCustom.value = workingTable._.importData.isCustom;
+      workingTable.html.metaCustomLibrary.value = workingTable._.importData.customLibrary;
+      workingTable.html.metaCJIVer.value = workingTable._.importData.cjiVer;
+   },
+   fromMetaMonitor: function(){
+      workingTable._.importData.library = workingTable.html.metaLibrary.value;
+      workingTable._.importData.libraryFull = workingTable.html.metaLibraryFull.value;
+      workingTable._.importData.type = workingTable.html.metaType.value;
+      workingTable._.importData.isDevTool = workingTable.html.metaIsDevTool.value;
+      workingTable._.importData.isCustom = workingTable.html.metaIsCustom.value;
+      workingTable._.importData.customLibrary = workingTable.html.metaCustomLibrary.value;
+      workingTable._.importData.cjiVer = workingTable.html.metaCJIVer.value;
    },
    /*refreshColumnNameField: function(){
       
@@ -151,9 +179,16 @@ var workingTable = {
       let container = document.createElement('span');
       let group = document.createElement('div');
       group.classList.add('info-group');
-      group.setAttribute('data-dt-library', workingTable._.importData.libraryFull + ' [' + workingTable._.importData.library + ']');
-      group.setAttribute('data-dt-type', workingTable._.importData.type);
       group.setAttribute('data-dt-export', workingTable._.importData.isDevTool);
+      group.setAttribute('data-dt-cji_ver', workingTable._.importData.cjiVer);
+      if(!workingTable._.importData.isCustom){
+         group.setAttribute('data-dt-library', workingTable._.importData.libraryFull + ' [' + workingTable._.importData.library + ']');
+         group.setAttribute('data-dt-type', workingTable._.importData.type);
+      }
+      else{
+         group.setAttribute('data-dt-is_custom', 'true');
+         group.setAttribute('data-dt-custom_library', workingTable._.importData.customLibrary);
+      }
       let groupHeader = document.createElement('p');
       groupHeader.classList.add('info-group-header');
       groupHeader.classList.add('ih');
@@ -200,6 +235,14 @@ workingTable.html.nameInput.addEventListener('keyup', e => {
 });
 
 workingTable.html.columnCountInput.addEventListener('keyup', handleTableColumnInput);
+
+workingTable.html.metaLibrary.addEventListener('keyup', workingTable.fromMetaMonitor);
+workingTable.html.metaLibraryFull.addEventListener('keyup', workingTable.fromMetaMonitor);
+workingTable.html.metaType.addEventListener('keyup', workingTable.fromMetaMonitor);
+workingTable.html.metaIsDevTool.addEventListener('keyup', workingTable.fromMetaMonitor);
+workingTable.html.metaIsCustom.addEventListener('keyup', workingTable.fromMetaMonitor);
+workingTable.html.metaCustomLibrary.addEventListener('keyup', workingTable.fromMetaMonitor);
+workingTable.html.metaCJIVer.addEventListener('keyup', workingTable.fromMetaMonitor);
 
 function handleTableColumnInput(){
    workingTable.name;
@@ -252,6 +295,7 @@ workingTable.html.buildTablePreviewButton.addEventListener('click', e => {
 
 handleTableColumnInput();
 workingTable.createNewRow();
+workingTable.updateMetaMonitor();
 // document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
 
 function outputTableHTML(){
@@ -336,6 +380,16 @@ async function processImportDataTable(){
    }
    let d_meta = up.meta;
    
+   let defaults = {
+      library: workingTable._.importData.library,
+      libraryFull: workingTable._.importData.libraryFull,
+      type: workingTable._.importData.type,
+      isDevTool: workingTable._.importData.isDevTool,
+      isCustom: workingTable._.importData.isCustom,
+      customLibrary: workingTable._.importData.customLibrary,
+      cjiVer: workingTable._.importData.cjiVer,
+   };
+   
    let libPing = workingTable._.importData.library;
    let backupLibPing = workingTable._.importData.libraryFull;
    let typePing = workingTable._.importData.type;
@@ -349,6 +403,7 @@ async function processImportDataTable(){
    
    let checkForOverride = /(?<=use-default\{).*?(?=\})/gm;
    let m_default = checkForOverride.test(d_meta) ? /true|1/gmi.test(d_meta.match(checkForOverride)[0]) : true;
+   
    /*
       Columns format by cji version:
         version  |  formatting notes
@@ -390,6 +445,17 @@ async function processImportDataTable(){
       pd.meta.type = dp_type;
    }
    // console.log('type ', dp_type);
+   
+   // Update workingTable library &c.
+   workingTable._.importData.library = libPing[0];
+   workingTable._.importData.libraryFull = backupLibPing[0];
+   workingTable._.importData.type = typePing[0];
+   workingTable._.importData.isDevTool = 'true';
+   workingTable._.importData.isCustom = !m_default;
+   workingTable._.importData.customLibrary = !m_default ? d_cols : false;
+   workingTable._.importData.customLibrary = cjiver;
+   workingTable.updateMetaMonitor();
+   
    // Override explicit columns with default, if found
    let cjiver_columns = cjiver;
    let usecols = d_cols;
@@ -399,9 +465,8 @@ async function processImportDataTable(){
       up.cols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
       usecols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
       console.log('Using default column layout for ' + pd.meta.type);
-   }
+   }else{ console.log('Using custom column layout for ' + pd.meta.type) };
    // console.log('cji version: ', cjiver);
-   let colp = /\d\<.*?\>/mg;
    /*let colpnest;
    switch(cjiver_columns){
       default:
@@ -410,6 +475,7 @@ async function processImportDataTable(){
          colpnest = /\w(?<!\\)\{+.*?(?<!\\)\}+/gm;
          break;
    }*/
+   let colp = /\d\<.*?\>/mg;
    // These 3 work with cji version 0 & 1
    let colpnest = /\w(?<!\\)\{+.*?(?<!\\)\}+/gm;
    let ndnget = /\w(?=(?<!\\)\{+)/gm;
@@ -428,6 +494,7 @@ async function processImportDataTable(){
          });
       });
    }
+   // console.log(pd.meta.cols);
    let rowp = /(?<=(?<colID>\w+)\{).*?(?=\})/gm;
    pd.xpol.cols.length = pd.xpol.ccnt;
    pd.xpol.rows.length = d_rows.length;
@@ -517,7 +584,182 @@ async function processImportDataTable(){
 }
 workingTable.html.tableImportConfirm.addEventListener('click', processImportDataTable);
 
-// Instead of an ignore function, just use a CJIReader to cut out unwanted parts
+// Convert an HTML table (back) into a CJI file
+function convertHTMLTableToCJI(html, /*l, f, t,*/ version = '0'){
+   // l = library      f = libraryFull      t = type
+   // May not even end up using them though, huh?
+   
+   // Declare the main data to convert
+   let _UseDefault, _Version, _Title, _Library, _LibraryFull, _Type, _CustomLibrary;
+   _Use_Default = true;
+   
+   let dummy, L;
+   L = html;
+   if(typeof html == 'string'){
+      dummy = document.createElement('span');
+      dummy.innerHTML = html;
+      L = dummy.children[0];
+   }
+   
+   if(!L.getAttribute('data-dt-export') == 'true'){
+      console.warn('Provided table may not be convertable into a CJI file!');
+   }
+   
+   // Get main HTML elements
+   let header, table;
+   let foundHeader = false;
+   for(let l of L.children){
+      if(l.nodeName == 'P' && l.classList.contains('ih') && !foundHeader){
+         header = l;
+         foundHeader = true;
+      }
+   }
+   let foundTable = false;
+   for(let l of L.children){
+      if(l.nodeName == 'TABLE' && l.classList.contains('info-table') && !foundTable){
+         table = l;
+         foundTable = true;
+      }
+   }
+   
+   // Get metadata
+   _UseDefault = L.getAttribute('data-dt-is_custom') == 'true' ? false : true;
+   _Version = L.getAttribute('data-dt-cji_ver') != null ? L.getAttribute('data-dt-cji_ver') : version;
+   _Title = header.innerText;
+   _Library = _UseDefault ? L.getAttribute('data-dt-library').split(/\s\[|\]/)[1] : false;
+   _LibraryFull = _UseDefault ? L.getAttribute('data-dt-library').split(/\s\[|\]/)[0] : false;
+   _Type = _UseDefault ? L.getAttribute('data-dt-type') : false;
+   _CustomLibrary = !_UseDefault ? L.getAttribute('data-dt-custom_library') : false;
+   
+   console.log('_UseDefault', _UseDefault);
+   console.log('_Version', _Version);
+   console.log('_Title', _Title);
+   console.log('_Library', _Library);
+   console.log('_LibraryFull', _LibraryFull);
+   console.log('_Type', _Type);
+   console.log('_CustomLibrary', _CustomLibrary);
+   
+   let innerBrackets = [];
+   innerBrackets[0] = version == '0' ? '{{' : '{';
+   innerBrackets[1] = version == '0' ? '}}' : '}';
+   let lbra = innerBrackets[0];
+   let rbra = innerBrackets[1];
+   
+   let metaConstruct = [];
+   if(_UseDefault){
+      metaConstruct.push(`use-default{${_UseDefault}}`);
+   }
+   if(_Title){
+      metaConstruct.push(`title{${_Title}}`);
+   }
+   if(_Library){
+      metaConstruct.push(`lib{${_Library}}`);
+   }
+   if(_LibraryFull){
+      metaConstruct.push(`libfull{${_LibraryFull}}`);
+   }
+   if(_Type){
+      metaConstruct.push(`type{${_Type}}`);
+   }
+   if(_CustomLibrary){
+      metaConstruct.push(`cols{${_CustomLibrary}}`);
+   }
+   
+   // Start building output file
+   let lines = [];
+   lines.push(`cjiver[${_Version}]`);
+   lines.push(`m[${metaConstruct.join('')}]`);
+   
+   // Get column data
+   // v Stolen from processImportDataTable and slightly modified
+   let cols = [];
+   let tags = [];
+   let d_cols = _UseDefault ? pokeLibrary(_Library, _LibraryFull, '', '')[_Type] : _CustomLibrary;
+   let colp = /\d\<.*?\>/mg;
+   // v For CJI ver 0 & 1
+   let colpnest = /\w(?<!\\)\{+.*?(?<!\\)\}+/gm;
+   let ndnget = /\w(?=(?<!\\)\{+)/gm;
+   let ndvget = /(?<=(?<!\\)\{+(?!\{)).*?(?=(?<!\\)\}+)/gm
+   if(colp.test(d_cols)){
+      let colpro = [...d_cols.match(colp)];
+      // pd.xpol.ccnt = colpro.length;
+      // pd.meta.cols.length = colpro.length;
+      colpro.forEach(c => {
+         let i = c.split('<')[0];
+         cols[i] = {};
+         let ndname = c.match(ndnget);
+         let ndvalue = c.match(ndvget);
+         [...c.match(colpnest)].forEach((nd, j) => {
+            cols[i][ndname[j]] = ndvalue[j];
+         });
+      });
+   }
+   cols.forEach(d => {
+      tags.push(d.s);
+   });
+   
+   console.log(table.childNodes);
+   let tr = Array.from(table.childNodes[0].childNodes);
+   // v From before using Array.from(...), left just in case needed for future logic
+   /*for(let r in table.children[0].children){
+      tr[Number(r)] = table.children[0].children[r];
+   }*/
+   tr.shift();
+   console.log(tr);
+   for(let r of tr){
+      let c = r.children;
+      let row = [];
+      row.push('[');
+      for(let i = 0; i < c.length; i ++){
+         // console.log(c[i].innerText);
+         cprime = c[i].innerHTML.split(/\<br(?:\s\/)*\>/);
+         for(let data of cprime){
+            row.push(`${tags[i]}{${data}}`);
+         }
+      }
+      row.push(']');
+      // console.log(row.join(''));
+      lines.push(row.join(''));
+   }
+   
+   // console.log(lines.join('\n'));
+   return lines.join('\n');
+}
+async function exportHTMLAsCJI(){
+   let text = convertHTMLTableToCJI(workingTable.buildTable().innerHTML);
+   let file = new Blob([text], {type: 'plain'});
+   
+   try{
+      let handle = await showSaveFilePicker({
+          suggestedName: `${workingTable._.name}.cji`,
+          types: [{
+              description: 'Text file',
+              accept: {'text/plain': ['.txt', '.cji']},
+          }],
+      });
+      
+      let writableStream = await handle.createWritable();
+      await writableStream.write(file);
+      await writableStream.close();
+   }catch(err){
+      console.warn('Could not run showSaveFilePicker: ', err);
+      console.log('Using boring download instead');
+      
+      let a = document.createElement("a");
+      let url = URL.createObjectURL(file);
+      a.href = url;
+      a.download = `${workingTable._.name}.cji`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+         document.body.removeChild(a);
+         window.URL.revokeObjectURL(url);
+      }, 0);
+   }
+}
+workingTable.html.tableExport.addEventListener('click', exportHTMLAsCJI);
+
+// Instead of an ignore argument, just use a CJIReader to cut out unwanted parts
 class CJIReader extends RegExp{
    constructor(tag, bracket, version, flag = 'mg'/*, ignore = [{}], escape = '`/'*/){
       // /(?<=cols(?<!(?<!\\)\{)(?<!\\)\{(?!\{)).*?(?=(?<!(?<!\\)\})(?<!\\)\}(?!(?<!\\)\}))/mg;
@@ -529,9 +771,6 @@ class CJIReader extends RegExp{
       let lbra, rbra;
       lbra = bracket[0];
       rbra = bracket[1];
-      // this.RegExp = new RegExp(`(?<=cols(?<!(?<!\\)\{)(?<!\\)\{(?!\{)).*?(?=(?<!(?<!\\)\})(?<!\\)\}(?!(?<!\\)\}))`, flag);
-      
-      // return this.RegExp;
       
       let re_argument = `(?<=(?<!\\w)${tag}(?<!(?<!\\\\)\\${lbra})(?<!\\\\)\\${lbra}(?!\\${lbra})).*?(?=(?<!(?<!\\\\)\\${rbra})(?<!\\\\)\\${rbra}(?!(?<!\\\\)\\${rbra}))`
       // let re_argument = `(?<=${tag}(?<!\\\\)\\${lbra}).*?(?=(?<=\\${rbra}[^\\${lbra}]*)\\${rbra})`;
@@ -629,8 +868,8 @@ const importDataDefaultLibrary_dictionaryTable = new ImportDataLibrary({
 });
 
 const libraryLibrary = {
-   'default': 'importDataDefaultLibrary_default',
-   'dictionary-table': 'importDataDefaultLibrary_dictionaryTable',
+   'default': importDataDefaultLibrary_default,
+   'dictionary-table': importDataDefaultLibrary_dictionaryTable,
 }
 function pokeLibrary(s, f, ds, df, onfail = 'default'){
    // d_ = default _
@@ -642,10 +881,13 @@ function pokeLibrary(s, f, ds, df, onfail = 'default'){
    if(shrtLib.includes(df)){ return libraryLibrary[shrtLib[fullLib.indexOf(df)]]; }
    return libraryLibrary[onfail] ?? libraryLibrary['default'];
 }
-
+/*function pingLibrary(s, f, ds, df, onfail = 'default'){
+   return libraryLibrary[pokeLibrary(s, f, ds, df, onfail)];
+}*/
 
 // I don't give a shit if this is good practice or not
 // It somehow does what I want it to so it stays
+// But most importantly it feels cool to edit prototypes like this
 String.prototype.pullCJIData = function(e){
    let temp = Array.from(this).join('');
    // console.log(temp);
