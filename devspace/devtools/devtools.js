@@ -1,3 +1,10 @@
+// FIND A WAY TO MAKE THIS WORK WITHOUT BEING TIED TO THE HTML
+// will allow for access on other pages, which in turn
+// will allow for a JS script that can read from a (CJI?) database and automatically make tables without needing to define them per-page
+
+// alt., could just hide the HTML stuff since this can manage the HTML on its own, but that would be messy and annoying
+// could use omnipresent to autocreate & delete it when needed though
+
 var workingTable = {
    html: {
       nameInput: document.querySelector('#table-name'),
@@ -22,6 +29,7 @@ var workingTable = {
       dynamicRowData: [],
       showImportPreview: false,
       rowsFilter: [['<br />', '; ']],
+      // ^ not the cleanest way of doing that
    },
    _: {
       name: '',
@@ -298,6 +306,11 @@ workingTable.createNewRow();
 workingTable.updateMetaMonitor();
 // document.getElementById('dummy').innerHTML = JSON.stringify(workingTable.html.dynamicRowData);
 
+
+// TODO
+// maybe add these functions to the workingTable object? may make it more consistent
+// alt., may just make other things a different file since this ones already so long
+
 function outputTableHTML(){
    let tabExtra = 0;
    if(+workingTable.html.outputTableExtraTabs.value > 0){
@@ -372,6 +385,9 @@ async function processImportDataTable(){
    // General purpose RegExp for getting non-nested data (cji version 0)
    // (if nested data is using {{ or }} instead of { or }):
    // /(?<=\w+(?<!(?<!\\)(?<!\\)\{)(?<!\\)\{(?!\{)).*?(?=(?<!(?<!\\)\})(?<!\\)\}(?!(?<!\\)\}))/mg
+   
+   // ^ probably outdated but im too lazy to check
+   //   safer to use CJIReader anyway
    
    // Unparsed data
    let meta = /m(?<!\\)\[.*?(?:(?<!\\))(?<!\\)\]/m;
@@ -758,6 +774,23 @@ async function exportHTMLAsCJI(){
    }
 }
 workingTable.html.tableExport.addEventListener('click', exportHTMLAsCJI);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO
+// Make a function/object/class/whatever for quickly accessing things for different CJI versions
+// (main example being the v0/v1 diff. of inset brackets)
+//
+// ALSO something relevant
+// add a ver. tracker for escape sequences
+// currently using `/<~~> to escape ~~,
+// but i was never too happy with that so may change it in future CJI versions
+//
+/*
+   THINGS TO ADD TO CJI VERSION THING
+   nested brackets
+   handling of many entries per tag per listing
+   escape keys/sequences
+*/
 
 // Instead of an ignore argument, just use a CJIReader to cut out unwanted parts
 class CJIReader extends RegExp{
