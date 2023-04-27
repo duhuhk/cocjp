@@ -1,9 +1,21 @@
-# ignore devspace stuff that doesn't need to be on the server
-devspace/notes
-devspace/notes/*
-devspace/old
-devspace/old/*
-# devspace/import-data/[something something outdated or corrected - maybe just move into ../old/ tho]
+# to any perfectionists browsing this:
+# no, i dont know the syntax
+# i dont even know if this works
 
-# ignore random txts
+# test page that im too lazy to delete
+testpage
+testpage/
+testpage/*
+testpage/index.html
+
+# devspace stuff that doesn't need to be on the server
+devspace/notes/localonly
+devspace/notes/localonly/
+devspace/notes/localonly/*
+devspace/old
+devspace/old/
+devspace/old/*
+# devspace/data-imports/[something something outdated or corrected - maybe just move into ../old/ tho]
+
+# random txts
 # *.txt
