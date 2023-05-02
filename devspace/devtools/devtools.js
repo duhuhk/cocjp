@@ -18,6 +18,7 @@ var workingTable = {
       tableImportFile: document.querySelector('#import-table'),
       tableImportConfirm: document.querySelector('#process-import-table'),
       tableExport: document.querySelector('#export-table'),
+      tableCJIOutput: document.querySelector('#output-table-cji'),
       metaLibrary: document.querySelector('#table-meta-library'),
       metaLibraryFull: document.querySelector('#table-meta-libraryFull'),
       metaType: document.querySelector('#table-meta-type'),
@@ -29,6 +30,7 @@ var workingTable = {
       dynamicRowData: [],
       showImportPreview: false,
       rowsFilter: [['<br />', '; ']],
+      rowsFilter_data:[[/(?<!\\);\s/, '<br />']],
       // ^ not the cleanest way of doing that
    },
    _: {
@@ -167,16 +169,26 @@ var workingTable = {
             let d = workingTable.createDataSlot(M, N);
             
             let v = workingTable._.rows[i][j];
-            let vfilter;
+            // console.log(v);
+            let vfilter, vfilter_data;
             if(v !== undefined){
                vfilter = v;
-               for(let f in workingTable.html.rowsFilter){
-                  vfilter = v.split(workingTable.html.rowsFilter[0][0]).join(workingTable.html.rowsFilter[1]);
+               vfilter_data = v;
+               for(let f of workingTable.html.rowsFilter){
+                  vfilter = vfilter.split(f[0]).join(f[1]);
+                  // console.log('f', f);
                }
+               for(let f of workingTable.html.rowsFilter_data){
+                  vfilter_data = vfilter_data.split(f[0]).join(f[1]);
+                  // console.log('f _data', f);
+               }
+               // console.log('vfilter', vfilter);
+               // console.log('vfilter_data', vfilter_data);
             }
             d.value = v === undefined ? '' : vfilter;
             row.appendChild(d);
             rarray[j] = d;
+            // workingTable._.rows[i][j] = vfilter_data;
          }
          workingTable.html.rowContainer.appendChild(row);
          workingTable.html.rowContainer.appendChild(document.createElement('br'));
@@ -233,6 +245,7 @@ var workingTable = {
       return container;
    },
    generatePreview: function(){
+      workingTable.refreshRows();
       workingTable.html.tablePreview.innerHTML = '';
       workingTable.html.tablePreview.appendChild(workingTable.buildTable());
    },
@@ -312,6 +325,7 @@ workingTable.updateMetaMonitor();
 // alt., may just make other things a different file since this ones already so long
 
 function outputTableHTML(){
+   workingTable.refreshRows();
    let tabExtra = 0;
    if(+workingTable.html.outputTableExtraTabs.value > 0){
       tabExtra = +workingTable.html.outputTableExtraTabs.value;
@@ -342,6 +356,7 @@ function outputTableHTML(){
    console.group('Table HTML output');
    console.log(xpoTable);
    console.groupEnd();
+   document.getElementById('dummy').innerText = '\n';
    for(let line of xpoTable){
       document.getElementById('dummy').appendChild(document.createElement('br'));
       document.getElementById('dummy').appendChild(document.createTextNode(line));
@@ -741,8 +756,9 @@ function convertHTMLTableToCJI(html, /*l, f, t,*/ version = '0'){
    // console.log(lines.join('\n'));
    return lines.join('\n');
 }
-async function exportHTMLAsCJI(){
-   let text = convertHTMLTableToCJI(workingTable.buildTable().innerHTML);
+async function exportHTMLAsCJI(html){
+   // let text = convertHTMLTableToCJI(workingTable.buildTable().innerHTML);
+   let text = convertHTMLTableToCJI(html);
    let file = new Blob([text], {type: 'plain'});
    
    try{
@@ -773,7 +789,14 @@ async function exportHTMLAsCJI(){
       }, 0);
    }
 }
-workingTable.html.tableExport.addEventListener('click', exportHTMLAsCJI);
+function outputHTMLAsCJI(html){
+   let text = convertHTMLTableToCJI(html);
+   // document.getElementById('dummy').appendChild(document.createElement('br'));
+   // document.getElementById('dummy').appendChild(document.createTextNode(text));
+   document.getElementById('dummy').innerText = '\n\n' + text;
+}
+workingTable.html.tableExport.addEventListener('click', () => { exportHTMLAsCJI(workingTable.buildTable().innerHTML) });
+workingTable.html.tableCJIOutput.addEventListener('click', () => { outputHTMLAsCJI(workingTable.buildTable().innerHTML) });
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO
