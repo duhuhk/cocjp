@@ -32,13 +32,13 @@
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Import / Export</p>
-            <label for="import-table">File to import from: </label><input type="file" id="import-table" accept=".txt,.cji" style="font-style: italic;">
+            <label for="import-table">Import from file: </label><input type="file" id="import-table" accept=".txt,.cji" style="font-style: italic;">
             <br />
             <button id="process-import-table">Process (click twice)</button>
             <hr />
-            <button id="export-table">Export table as .cji</button>
+            <button id="export-table-as-cji">Export table as .cji</button>
             <br />
-            <button id="output-table-cji">Output table cji data</button>
+            <button id="export-table-as-txt">Export table as .txt</button>
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Table Name</p>
@@ -58,6 +58,8 @@
             <label style="position: absolute;" for="table-meta-customLibrary">customLibrary: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-customLibrary" type="text">
             <br />
             <label style="position: absolute;" for="table-meta-cjiVer">cjiVer: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-cjiVer" type="text">
+            <br />
+            <label style="position: absolute;" for="table-meta-outTab">outputTabChar: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-outTab" type="text">
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Columns</p>
@@ -72,16 +74,31 @@
             <button id="clear-empty-rows">Remove empty rows (placeholder)</button>
          </div>
          <div class="info-group">
-            <p class="ih info-nested-header">Preview</p>
+            <p class="ih info-nested-header">Table Preview</p>
             <button id="build-preview-table">Build preview</button>
+            <span id="table-preview"></span>
+         </div>
+         <div class="info-group">
+            <p class="ih info-nested-header">Convert CJI to Google Sheets data</p>
+            <button id="file-to-Gsheets">Use processed .cji file</button>
+            <hr />
+            <textarea id="user-data-convert-cji-to-Gsheets" placeholder="Custom CJI data here..." style="width: calc(100% - 8px);" rows="1"></textarea>
             <br />
+            <button id="cji-to-Gsheets">Use custom CJI data</button>
+         </div>
+         <div class="info-group">
+            <p class="ih info-nested-header">Output Data</p>
+            <button id="output-table-cji">Output table CJI data</button>
+            <hr />
             <button id="output-table-html">Output HTML</button>&emsp;
             <label for="extra-tab-table-output">Add additional tabs: </label><input type="text" id="extra-tab-table-output" value="2">
-            <span id="table-preview"></span>
-            <span id="dummy"></span>
+            <!--<br /><br />-->
+            <hr />
+            <div class="info-group" style="background-color: var(--color-i-base);">
+               <p class="ih info-group-header">Output</p>
+               <span id="dummy"><i>No output yet.</i></span>
+            </div>
          </div>
-         
-         <!--<p id="dummy"></p>-->
       </div>
    </div>
    

@@ -16,7 +16,6 @@ m[use-default{true}title{Ru-Verbs}lib{dictionary-table}libfull{importDataDefault
 [k{点ける}r{つける}d{To turn on}u{ru-verb}p{を}l{}]
 [k{眼鏡を掛ける}r{めがねをかける}d{To put on (glasses)}d{To wear (glasses)}u{ru-verb}p{(めがね)を}l{}]
 [k{着る}r{きる}d{To put on (above the waist)}u{ru-verb}p{を}l{}]
-[k{}r{}d{}u{}p{}l{}]
 [k{痩せる}r{やせる}d{To lose weight}u{ru-verb}p{×}l{}]
 [k{痩せている}r{やせている}d{To be thin}u{いる compound}u{⇒ u-verb}p{×}l{}]
 [k{捨てる}r{すてる}d{To throw away}u{ru-verb}p{を}l{}]

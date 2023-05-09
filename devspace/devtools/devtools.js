@@ -17,7 +17,8 @@ var workingTable = {
       outputTableExtraTabs: document.querySelector('#extra-tab-table-output'),
       tableImportFile: document.querySelector('#import-table'),
       tableImportConfirm: document.querySelector('#process-import-table'),
-      tableExport: document.querySelector('#export-table'),
+      tableExportCJI: document.querySelector('#export-table-as-cji'),
+      tableExportTXT: document.querySelector('#export-table-as-txt'),
       tableCJIOutput: document.querySelector('#output-table-cji'),
       metaLibrary: document.querySelector('#table-meta-library'),
       metaLibraryFull: document.querySelector('#table-meta-libraryFull'),
@@ -26,6 +27,10 @@ var workingTable = {
       metaIsCustom: document.querySelector('#table-meta-isCustom'),
       metaCustomLibrary: document.querySelector('#table-meta-customLibrary'),
       metaCJIVer: document.querySelector('#table-meta-cjiVer'),
+      metaOutTab: document.querySelector('#table-meta-outTab'),
+      convertCJIToGSheets: document.querySelector('#cji-to-Gsheets'),
+      convertCJIToGSheetsData: document.querySelector('#user-data-convert-cji-to-Gsheets'),
+      convertFileToGSheets: document.querySelector('#file-to-Gsheets'),
       dynamicColumnNames: [],
       dynamicRowData: [],
       showImportPreview: false,
@@ -46,6 +51,10 @@ var workingTable = {
          isCustom: false,
          customLibrary: false,
          cjiVer: 1,
+         // outputTabChar: '\t',
+         // ^ For some reason, this doesn't display properly,
+         // so whatever ℣ is is my stand in for tabs
+         outputTabChar: '℣',
       },
    },
    get name(){
@@ -61,6 +70,7 @@ var workingTable = {
       workingTable.html.metaIsCustom.value = workingTable._.importData.isCustom;
       workingTable.html.metaCustomLibrary.value = workingTable._.importData.customLibrary;
       workingTable.html.metaCJIVer.value = workingTable._.importData.cjiVer;
+      workingTable.html.metaOutTab.value = workingTable._.importData.outputTabChar;
    },
    fromMetaMonitor: function(){
       workingTable._.importData.library = workingTable.html.metaLibrary.value;
@@ -70,6 +80,7 @@ var workingTable = {
       workingTable._.importData.isCustom = workingTable.html.metaIsCustom.value;
       workingTable._.importData.customLibrary = workingTable.html.metaCustomLibrary.value;
       workingTable._.importData.cjiVer = workingTable.html.metaCJIVer.value;
+      workingTable._.importData.outputTabChar = workingTable.html.metaOutTab.value;
    },
    /*refreshColumnNameField: function(){
       
@@ -246,8 +257,12 @@ var workingTable = {
    },
    generatePreview: function(){
       workingTable.refreshRows();
+      // workingTable.html.buildTablePreviewButton.style.marginBottom = '0';
+      // workingTable.html.outputTableButton.style.marginBottom = '5px';
       workingTable.html.tablePreview.innerHTML = '';
+      // workingTable.html.tablePreview.appendChild(document.createElement('p'));
       workingTable.html.tablePreview.appendChild(workingTable.buildTable());
+      // workingTable.html.tablePreview.style.marginTop = '50px';
    },
 };
 
@@ -339,11 +354,11 @@ function outputTableHTML(){
    xpoTable = xpoTable.replace(/(?<=^\t(?<otab>\t*)\<(?<tag>\w+(?=\s))[^]*?)(?=\k<otab>\<\k<tag>)/gm, '\t');
    xpoTable = xpoTable.replace(/(?<=^\<(?<tag>\w+(?=\s))[^]*)(?=\<\/\k<tag>)/gm, '');
    // I used to like regex
-   xpoTable = xpoTable.split('\t').join('℣');               // Whatever ℣ is is my stand in for tabs
+   xpoTable = xpoTable.split('\t').join(workingTable._.importData.outputTabChar);
    xpoTable = xpoTable.split('\n');
    let tabs = [];
    for(let inefficient = 0; inefficient < tabExtra; inefficient++){
-      tabs.push('℣');
+      tabs.push(workingTable._.importData.outputTabChar);
    }
    tabs = tabs.join('');
    xpoTable.forEach((l, i) => {
@@ -356,10 +371,11 @@ function outputTableHTML(){
    console.group('Table HTML output');
    console.log(xpoTable);
    console.groupEnd();
-   document.getElementById('dummy').innerText = '\n';
+   // document.getElementById('dummy').innerText = '\n';
+   document.getElementById('dummy').innerText = '';
    for(let line of xpoTable){
-      document.getElementById('dummy').appendChild(document.createElement('br'));
       document.getElementById('dummy').appendChild(document.createTextNode(line));
+      document.getElementById('dummy').appendChild(document.createElement('br'));
    }
    // document.getElementById('dummy').appendChild(document.createTextNode('a'));
 }
@@ -430,7 +446,7 @@ async function processImportDataTable(){
    libPing = getLib.test(d_meta) ? getLib.pull(d_meta) : libPing;
    backupLibPing = getFullLib.test(d_meta) ? getFullLib.pull(d_meta) : backupLibPing;
    typePing = getType.test(d_meta) ? getType.pull(d_meta) : typePing;
-   let library = pokeLibrary(libPing, backupLibPing, workingTable._.importData.library, workingTable._.importData.libraryFull);
+   let Library = pokeLibrary(libPing, backupLibPing, workingTable._.importData.library, workingTable._.importData.libraryFull);
    
    let checkForOverride = /(?<=use-default\{).*?(?=\})/gm;
    let m_default = checkForOverride.test(d_meta) ? /true|1/gmi.test(d_meta.match(checkForOverride)[0]) : true;
@@ -439,7 +455,7 @@ async function processImportDataTable(){
       Columns format by cji version:
         version  |  formatting notes
       -----------+--------------------
-            0    |  uses double squigly braces ({{ and }}) for nested data
+            0    |  uses double squggly braces ({{ and }}) for nested data
             1    |  no special formatting for nested braces
    */
    let columns, d_cols, d_rows;
@@ -490,11 +506,11 @@ async function processImportDataTable(){
    // Override explicit columns with default, if found
    let cjiver_columns = cjiver;
    let usecols = d_cols;
-   if(Object.keys(importDataDefaultLibrary_dictionaryTable).includes(pd.meta.type) && m_default){
+   if(Object.keys(Library).includes(pd.meta.type) && m_default){
       cjiver_columns = '0';
-      d_cols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
-      up.cols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
-      usecols = importDataDefaultLibrary_dictionaryTable[pd.meta.type];
+      d_cols = Library[pd.meta.type];
+      up.cols = Library[pd.meta.type];
+      usecols = Library[pd.meta.type];
       console.log('Using default column layout for ' + pd.meta.type);
    }else{ console.log('Using custom column layout for ' + pd.meta.type) };
    // console.log('cji version: ', cjiver);
@@ -756,14 +772,14 @@ function convertHTMLTableToCJI(html, /*l, f, t,*/ version = '0'){
    // console.log(lines.join('\n'));
    return lines.join('\n');
 }
-async function exportHTMLAsCJI(html){
+async function exportHTMLAs(type, html){
    // let text = convertHTMLTableToCJI(workingTable.buildTable().innerHTML);
    let text = convertHTMLTableToCJI(html);
    let file = new Blob([text], {type: 'plain'});
    
    try{
       let handle = await showSaveFilePicker({
-          suggestedName: `${workingTable._.name}.cji`,
+          suggestedName: `${workingTable._.name}.${type}`,
           types: [{
               description: 'Text file',
               accept: {'text/plain': ['.txt', '.cji']},
@@ -780,7 +796,7 @@ async function exportHTMLAsCJI(html){
       let a = document.createElement("a");
       let url = URL.createObjectURL(file);
       a.href = url;
-      a.download = `${workingTable._.name}.cji`;
+      a.download = `${workingTable._.name}.${type}`;
       document.body.appendChild(a);
       a.click();
       setTimeout(() => {
@@ -793,10 +809,116 @@ function outputHTMLAsCJI(html){
    let text = convertHTMLTableToCJI(html);
    // document.getElementById('dummy').appendChild(document.createElement('br'));
    // document.getElementById('dummy').appendChild(document.createTextNode(text));
-   document.getElementById('dummy').innerText = '\n\n' + text;
+   // document.getElementById('dummy').innerText = '\n\n' + text;
+   document.getElementById('dummy').innerText = text;
 }
-workingTable.html.tableExport.addEventListener('click', () => { exportHTMLAsCJI(workingTable.buildTable().innerHTML) });
+workingTable.html.tableExportCJI.addEventListener('click', () => { exportHTMLAs('cji', workingTable.buildTable().innerHTML) });
+workingTable.html.tableExportTXT.addEventListener('click', () => { exportHTMLAs('txt', workingTable.buildTable().innerHTML) });
 workingTable.html.tableCJIOutput.addEventListener('click', () => { outputHTMLAsCJI(workingTable.buildTable().innerHTML) });
+
+function convertCJIToGoogleSheetsData(str){
+   let E, e, S;
+   // [E]ntries (un-trimmed), [e]ntries, [S]trings (all),      << UNUSED >>: [s]tring, [t]ag, [d]ata
+   
+   let c = {         // compiled data ...
+      a: {           // ... as array
+         t: [],
+         d: [],
+      },
+      s: {           // ... as string
+         t: '',
+         d: '',
+      },
+   };
+   
+   E = str.split('\n');
+   e = E.filter(entry => Array.from(entry)[0] == '[');
+   S = Array.from(e, n => n.split(/\[|\]/).join('').split(/(?<=\{)(?=\})/).join(' ').split(/(?<=\{)|(?=\{)|(?<=\})|(?=\})/).join('\n').split('\n'));
+   S.forEach(s => {
+      let t = s.filter((n, i) => i % 4 == 0);
+      t.unshift('[');
+      t.push(']');
+      t = t.join('\n');
+      c.a.t.push(t);
+      
+      let d = s.filter((n, i) => i % 4 == 2);
+      d.unshift(' ');
+      d.push(' ');
+      d = d.join('\n');
+      c.a.d.push(d);
+   });
+   c.s.t = c.a.t.join('\n');
+   c.s.d = c.a.d.join('\n');
+   
+   // console.log(e, S);
+   console.table(c);
+   
+   let D = document.getElementById('dummy');
+   D.innerText = '';
+   D.innerHTML = '';
+   
+   let out = document.createElement('table');
+   out.classList.add('info-table');
+   let heO = document.createElement('tr');      // header for out
+   heO.classList.add('info-table-row');
+   let he1, he2, he3;
+   he1 = document.createElement('th');
+   he1.classList.add('info-table-header');
+   he1.innerText = 'ENTRY TAGS COLUMN';
+   he2 = document.createElement('th');
+   he2.classList.add('info-table-header');
+   he2.innerText = 'BRACKET FILL COL.';
+   he3 = document.createElement('th');
+   he3.classList.add('info-table-header');
+   he3.innerText = 'ENTRY DATA COLUMN';
+   heO.appendChild(he1);
+   heO.appendChild(he2);
+   heO.appendChild(he3);
+   out.appendChild(heO);
+   
+   let R = [[], [], Array.from('!FIX BRACKET FUNCTION! ')];
+   R[0] = c.s.t.split('\n');
+   R[1] = c.s.d.split('\n');
+   
+   for(let i = 0; i < R[0].length; i ++){
+      let row;
+      let row_tag, row_fix, row_dat;
+      
+      row = document.createElement('tr');
+      row.classList.add('info-table-row');
+      
+      row_tag = document.createElement('td');
+      row_tag.classList.add('info-table-data');
+      row_tag.innerText = R[0][i];
+      row_fix = document.createElement('td');
+      row_fix.classList.add('info-table-data');
+      row_fix.innerText = R[2][i % R[2].length];
+      row_dat = document.createElement('td');
+      row_dat.classList.add('info-table-data');
+      row_dat.innerText = R[1][i];
+      
+      row.appendChild(row_tag);
+      row.appendChild(row_fix);
+      row.appendChild(row_dat);
+      out.appendChild(row);
+   }
+   
+   D.appendChild(out);
+}
+
+workingTable.html.convertFileToGSheets.addEventListener('click', e => {
+   let text = convertHTMLTableToCJI(workingTable.buildTable().innerHTML);
+   convertCJIToGoogleSheetsData(text);
+});
+workingTable.html.convertCJIToGSheetsData.addEventListener('keydown', e => {
+   workingTable.html.convertCJIToGSheetsData.rows = workingTable.html.convertCJIToGSheetsData.value.split('\n').length + 1;
+});
+workingTable.html.convertCJIToGSheetsData.addEventListener('keyup', e => {
+   workingTable.html.convertCJIToGSheetsData.rows = workingTable.html.convertCJIToGSheetsData.value.split('\n').length + 1;
+});
+workingTable.html.convertCJIToGSheets.addEventListener('click', e => {
+   convertCJIToGoogleSheetsData(workingTable.html.convertCJIToGSheetsData.value);
+});
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO
