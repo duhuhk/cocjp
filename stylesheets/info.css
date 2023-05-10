@@ -50,7 +50,15 @@
    /* v To prevent highlighting when minimizing */
    user-select: none;
 }
-/* Characters for minimizing：○●▾▸▼►▷◇◆ */
+/*
+Characters for minimizing：
+   ○ ●
+   ▾ ▸
+   ▼ ►
+     ▷
+   ◇ ◆
+   + ―
+*/
 .ih[data-is-minimized='true']::before{
    content: '+ ';
    float: left;
@@ -117,8 +125,29 @@
    /*background-color: rgba(180,255,170,1);*/
    background-color: var(--color-i-nested-header);
 }
+/*
+Characters for sorting:
+   ▽ △
+   ▼ ▲
+*/
 .info-table-header::after{
-   content: '△▽▲▼';
+   content: '△▽';
+   font-size: 0.8em;
+   vertical-align: middle;
+   margin-left: 16px;
+   float: right;
+   /* v To prevent highlighting when sorting */
+   user-select: none;
+}
+.info-table-header[data-sort='+']::after{
+   content: '▲▽';
+   font-size: 0.8em;
+   vertical-align: middle;
+   margin-left: 16px;
+   float: right;
+}
+.info-table-header[data-sort='-']::after{
+   content: '△▼';
    font-size: 0.8em;
    vertical-align: middle;
    margin-left: 16px;
