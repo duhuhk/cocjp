@@ -46,6 +46,25 @@
    margin-bottom: 4px;
    padding: 5px;
    border-bottom: 1px solid black;
+   /* v To prevent highlighting when minimizing */
+   user-select: none;
+}
+/* Characters for minimizing：●○▾▸▼► */
+.ih[data-is-minimized='true']::before{
+   content: '► ';
+   font-family: monospace;
+   font-weight: bold;
+   font-style: normal;
+   vertical-align: bottom;
+   font-size: 1.1em;
+}
+.ih[data-is-minimized='false']::before{
+   content: '▼ ';
+   font-family: monospace;
+   font-weight: bold;
+   font-style: normal;
+   vertical-align: bottom;
+   font-size: 1.1em;
 }
 
 .info-body-header{

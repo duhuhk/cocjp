@@ -46,20 +46,31 @@
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Table Meta</p>
-            <label style="position: absolute;" for="table-meta-library">library: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-library" type="text">
-            <br />
-            <label style="position: absolute;" for="table-meta-libraryFull">libraryFull: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-libraryFull" type="text">
-            <br />
-            <label style="position: absolute;" for="table-meta-type">type: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-type" type="text">
-            <br />
-            <label style="position: absolute;" for="table-meta-isDevTool">isDevTool: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-isDevTool" type="text">
-            <br />
-            <label style="position: absolute;" for="table-meta-isCustom">isCustom: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-isCustom" type="text"><br />
-            <label style="position: absolute;" for="table-meta-customLibrary">customLibrary: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-customLibrary" type="text">
-            <br />
-            <label style="position: absolute;" for="table-meta-cjiVer">cjiVer: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-cjiVer" type="text">
-            <br />
-            <label style="position: absolute;" for="table-meta-outTab">outputTabChar: </label><input style="margin-left: 115px; width: 750px;" id="table-meta-outTab" type="text">
+            <span style="display: grid; grid-template-columns: auto 1fr; grid-auto-columns: min-content; column-gap: 6px;">
+               <label style="grid-column: 1;" for="table-meta-library">library: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-library" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-libraryFull">libraryFull: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-libraryFull" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-type">type: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-type" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-isDevTool">isDevTool: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-isDevTool" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-isCustom">isCustom: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-isCustom" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-customLibrary">customLibrary: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-customLibrary" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-cjiVer">cjiVer: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-cjiVer" type="text">
+               <br />
+               <label style="grid-column: 1;" for="table-meta-outTab">outputTabChar: </label>
+               <input style="grid-column: 2; width: auto;" id="table-meta-outTab" type="text">
+            </span>
          </div>
          <div class="info-group">
             <p class="ih info-nested-header">Columns</p>
@@ -102,8 +113,8 @@
       </div>
    </div>
    
-   <script src="./devtools.js"></script>
+   <script src="../../script/omnipresent.js"></script>
    
-   <script src="https://duhuhk.github.io/cocjp/script/omnipresent.js"></script>
+   <script src="./devtools.js"></script>
 </body>
 </html>
