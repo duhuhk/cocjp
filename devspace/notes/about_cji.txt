@@ -1,0 +1,115 @@
+====================
+.CJI FILES
+====================
+.cji (CocJp Import) is the file format made for the cocjp website
+It allows for importing large amounts of data into an HTML table to simplify the process of creating dictionaries for cocjp
+.cji files are composed of by lines of 'entries' ー self-contained rows of information which include data for the dictionary entry
+
+====================
+ENTRIES
+====================
+A CJI entry is a line withsquare brackets ( [ and ] ) marking its beginning and ending
+Within the brackets are tag/data pairs, which are used to fill out the dictionary entry
+"Tag" refers to the (typically single-letter) name immediately followed by squiggly brackets ( { and } ) which contain the tag/data pair's datum. The tag determines which column of the final table the data will be in.
+"Datum" refers to the text within the squiggly brackets that come after a tag. Each datum is converted into a cell (or line in a cell, when there are many tag/data pairs for a single tag type) in the final table.
+
+Typically, entries do not have anything coming before their opening bracket. However, 2 special cases exist:
+	The version entry, which is used to determine how to handle the .cji file (for allowing older/outdated files to still be processed)
+		cjiver[ version ], where version is the version to be parsed by ー important to note is that version is not a tag/data pair, but a lone string/number representing the version
+	The header entry, which contains necessary metadata for constructing the final table
+		m[ ... ], where the ... stands for the various tag/data pairs that define the meta data (see TAGS)
+
+====================
+CJI VERSION
+====================
+If no CJIVer entry is detected, the computer will default to handling it as CJIVer 1
+
+VERSION	TRAITS
+0	Nested brackets are doubled, e.g. nested { ... } -> {{ ... }}
+1	No special behaviours for nested brackets (a nested { ... } will still be { ... }, unlike in CJI version 0)
+
+Currently, all CJI versions treat `\< χ > as the escape sequence for χ. However, as .cji files are parsed as .txt files containing raw text, normal escape sequences/keys will still work, but be largely ignored by the parser.
+
+About escaped sequences/keys:
+ SEQ. / KEY	  | MEANING
+ --------------+--------
+ n			  | newline
+
+====================
+TAGS
+====================
+  TAG			  | ENTRY TYPE	  | NAME			  | TAKES	  | DESCRIPTION
+ -----------------+---------------+-------------------+-----------+----------------------------------------------------------------------------------------------------------------------------------------------
+  use-default	  | header		  | use default		  | boolean	  | whether or not to allow the cji to override default (e.g. default columns for a library type)
+  title			  | header		  | title			  | string	  | title of the table
+  lib			  | header		  | library			  | string	  | what library to access for table column data
+  libfull		  | header		  | library (full)	  | string	  | full name of the library to access; used in case of the library tag not pointing to a valid library
+  type			  | header		  | library type	  | string	  | what type of table to make; points within the library being accessed (to, e.g., columns)
+  cols			  | header		  | columns			  | special * | custom-stated columns to use in the table; will only be used if either (a) use-default is true, (b) pokeLibrary does not return a usable library
+  k				  | 			  | kanji			  | string	  | the kanji of the dictionary entry
+  r				  |				  | reading			  | string	  | the kana spelling of the dictionary entry
+  u				  |				  | type			  | string	  | the type (u/ru verb, i/na adj, etc.) of the dictionary entry
+  d				  |				  | definition		  | string	  | the English translation of the dictionary entry
+  p				  |				  | particle		  | string	  | the particle(s) the dicitionary entry takes
+  l				  | 			  | lesson			  | string	  | the number of the lesson the dictionary entry comes from
+
+* About the cols tag:
+The cols tag takes a CJIVer-dependent string defining the columns of the table; the nested brackets within the string will be dependent on the CJI version (see CJI VERSION)
+In CJIVer 0, it looks similar to this:
+	cols{0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{particle(s)}}s{{p}}>4<n{{lesson #}}s{{l}}>}
+
+====================
+EXAMPLE CJI FILE
+====================
+cjiver[1]
+m[use-default{true}title{U-Verbs}lib{dictionary-table}libfull{importDataDefaultLibrary_dictionaryTable}type{dictionary-verb}]
+[k{行く}r{いく}d{To go (destination)}u{u-verb}p{}l{}]
+[k{帰る}r{かえる}d{To go back}d{To return}u{u-verb}p{}l{}]
+[k{聞く}r{きく}d{To listen}d{To hear}u{u-verb}p{}l{}]
+[k{飲む}r{のむ}d{To drink}u{u-verb}p{}l{}]
+[k{話す}r{はなす}d{To speak}d{To talk}u{u-verb}p{}l{}]
+[k{読む}r{よむ}d{To read}u{u-verb}p{}l{}]
+[k{会う}r{あう}d{To meet}d{To see (a person)}u{u-verb}p{}l{}]
+[k{有る}r{ある}d{There is…}u{u-verb}p{}l{}]
+[k{買う}r{かう}d{To buy}u{u-verb}p{}l{}]
+[k{書く}r{かく}d{To write}u{u-verb}p{}l{}]
+[k{撮る}r{とる}d{To take (a picture)}u{u-verb}p{}l{}]
+[k{待つ}r{まつ}d{To wait}u{u-verb}p{}l{}]
+[k{分かる}r{わかる}d{To understand}u{u-verb}p{}l{}]
+[k{泳ぐ}r{およぐ}d{To swim}u{u-verb}p{}l{}]
+[k{聞く}r{きく}d{To ask}u{u-verb}p{}l{}]
+[k{乗る}r{のる}d{To ride}d{To board}u{u-verb}p{}l{}]
+[k{}r{やる}d{To do}d{To perform}u{u-verb}p{}l{}]
+[k{遊ぶ}r{あそぶ}d{To play}d{To spend time pleasantly}u{u-verb}p{}l{}]
+[k{急ぐ}r{いそぐ}d{To hurry}u{u-verb}p{}l{}]
+[k{返す}r{かえす}d{To return (a thing)}u{u-verb}p{}l{}]
+[k{消す}r{けす}d{To turn off}u{u-verb}p{}l{}]
+[k{死ぬ}r{しぬ}d{To die}u{u-verb}p{}l{}]
+[k{座る}r{すわる}d{To sit down}u{u-verb}p{}l{}]
+[k{立つ}r{たつ}d{To stand up}u{u-verb}p{}l{}]
+[k{タバコを吸う}r{たばこをすう}d{To smoke}u{u-verb}p{}l{}]
+[k{使う}r{つかう}d{To use}u{u-verb}p{}l{}]
+[k{手伝う}r{てつだう}d{To help}u{u-verb}p{}l{}]
+[k{入る}r{はいる}d{To enter}u{u-verb}p{}l{}]
+[k{持つ}r{もつ}d{To carry}d{To hold}u{u-verb}p{}l{}]
+[k{休む}r{やすむ}d{To be absent from}d{To rest}u{u-verb}p{}l{}]
+[k{歌う}r{うたう}d{To sing}u{u-verb}p{}l{}]
+[k{}r{かぶる}d{To put on (a hat)}u{u-verb}p{}l{}]
+[k{}r{はく}d{To put on (below waist)}u{u-verb}p{}l{}]
+[k{知る}r{しる}d{To get to know}u{u-verb}p{}l{}]
+[k{知っている}r{しっています}d{I know}u{いる compound}u{ ⇒ u-verb}p{}l{}]
+[k{知りません}r{しりません}d{I do not know}u{u-verb}p{}l{}]
+[k{住む}r{すむ}d{To live (somewhere)}u{u-verb}p{}l{}]
+[k{働く}r{はたらく}d{To work}u{u-verb}p{}l{7}]
+[k{太る}r{ふとる}d{To gain weight}u{u-verb}p{}l{}]
+[k{太っています}r{ふとっています}d{To be overweight}u{いる compound}u{⇒ u-verb}p{}l{}]
+[k{洗う}r{あらう}d{To wash}u{u-verb}p{}l{8}]
+[k{言う}r{いう}d{To say}u{u-verb}p{}l{}]
+[k{要る}r{いる}d{To need}u{u-verb}p{}l{}]
+[k{遅くなる}r{おそくなる}d{To be late}u{u-verb}p{}l{8}]
+[k{お風呂に入る}r{おふろにはいる}d{To take a bath}u{u-verb}p{}l{}]
+[k{思う}r{おもう}d{To think}u{u-verb}p{}l{}]
+[k{切る}r{きる}d{To cut}u{u-verb}p{}l{}]
+[k{作る}r{つくる}d{To make}u{u-verb}p{}l{}]
+[k{(雨が / 雪が) 降る}r{(あめが / ゆきが) ふる}d{To fall (rain/snow)}u{u-verb}p{}l{}]
+[k{持って行く}r{もっていく}d{To take (a thing)}u{u-verb}p{}l{8}]
