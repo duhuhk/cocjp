@@ -14,49 +14,49 @@ Within the brackets are tag/data pairs, which are used to fill out the dictionar
 "Datum" refers to the text within the squiggly brackets that come after a tag. Each datum is converted into a cell (or line in a cell, when there are many tag/data pairs for a single tag type) in the final table.
 
 Typically, entries do not have anything coming before their opening bracket. However, 2 special cases exist:
-	The version entry, which is used to determine how to handle the .cji file (for allowing older/outdated files to still be processed)
-		cjiver[ version ], where version is the version to be parsed by ー important to note is that version is not a tag/data pair, but a lone string/number representing the version
-	The header entry, which contains necessary metadata for constructing the final table
-		m[ ... ], where the ... stands for the various tag/data pairs that define the meta data (see TAGS)
+    The version entry, which is used to determine how to handle the .cji file (for allowing older/outdated files to still be processed)
+        cjiver[ version ], where version is the version to be parsed by ー important to note is that version is not a tag/data pair, but a lone string/number representing the version
+    The header entry, which contains necessary metadata for constructing the final table
+        m[ ... ], where the ... stands for the various tag/data pairs that define the meta data (see TAGS)
 
 ====================
 CJI VERSION
 ====================
 If no CJIVer entry is detected, the computer will default to handling it as CJIVer 1
 
-VERSION	TRAITS
-0	Nested brackets are doubled, e.g. nested { ... } -> {{ ... }}
-1	No special behaviours for nested brackets (a nested { ... } will still be { ... }, unlike in CJI version 0)
+VERSION TRAITS
+0   Nested brackets are doubled, e.g. nested { ... } -> {{ ... }}
+1   No special behaviours for nested brackets (a nested { ... } will still be { ... }, unlike in CJI version 0)
 
 Currently, all CJI versions treat `\< χ > as the escape sequence for χ. However, as .cji files are parsed as .txt files containing raw text, normal escape sequences/keys will still work, but be largely ignored by the parser.
 
 About escaped sequences/keys:
- SEQ. / KEY	  | MEANING
+ SEQ. / KEY   | MEANING
  --------------+--------
- n			  | newline
+ n            | newline
 
 ====================
 TAGS
 ====================
-  TAG			  | ENTRY TYPE	  | NAME			  | TAKES	  | DESCRIPTION
+  TAG             | ENTRY TYPE    | NAME              | TAKES     | DESCRIPTION
  -----------------+---------------+-------------------+-----------+----------------------------------------------------------------------------------------------------------------------------------------------
-  use-default	  | header		  | use default		  | boolean	  | whether or not to allow the cji to override default (e.g. default columns for a library type)
-  title			  | header		  | title			  | string	  | title of the table
-  lib			  | header		  | library			  | string	  | what library to access for table column data
-  libfull		  | header		  | library (full)	  | string	  | full name of the library to access; used in case of the library tag not pointing to a valid library
-  type			  | header		  | library type	  | string	  | what type of table to make; points within the library being accessed (to, e.g., columns)
-  cols			  | header		  | columns			  | special * | custom-stated columns to use in the table; will only be used if either (a) use-default is true, (b) pokeLibrary does not return a usable library
-  k				  | 			  | kanji			  | string	  | the kanji of the dictionary entry
-  r				  |				  | reading			  | string	  | the kana spelling of the dictionary entry
-  u				  |				  | type			  | string	  | the type (u/ru verb, i/na adj, etc.) of the dictionary entry
-  d				  |				  | definition		  | string	  | the English translation of the dictionary entry
-  p				  |				  | particle		  | string	  | the particle(s) the dicitionary entry takes
-  l				  | 			  | lesson			  | string	  | the number of the lesson the dictionary entry comes from
+  use-default     | header        | use default       | boolean   | whether or not to allow the cji to override default (e.g. default columns for a library type)
+  title           | header        | title             | string    | title of the table
+  lib             | header        | library           | string    | what library to access for table column data
+  libfull         | header        | library (full)    | string    | full name of the library to access; used in case of the library tag not pointing to a valid library
+  type            | header        | library type      | string    | what type of table to make; points within the library being accessed (to, e.g., columns)
+  cols            | header        | columns           | special * | custom-stated columns to use in the table; will only be used if either (a) use-default is true, (b) pokeLibrary does not return a usable library
+  k               |               | kanji             | string    | the kanji of the dictionary entry
+  r               |               | reading           | string    | the kana spelling of the dictionary entry
+  u               |               | type              | string    | the type (u/ru verb, i/na adj, etc.) of the dictionary entry
+  d               |               | definition        | string    | the English translation of the dictionary entry
+  p               |               | particle          | string    | the particle(s) the dicitionary entry takes
+  l               |               | lesson            | string    | the number of the lesson the dictionary entry comes from
 
 * About the cols tag:
 The cols tag takes a CJIVer-dependent string defining the columns of the table; the nested brackets within the string will be dependent on the CJI version (see CJI VERSION)
 In CJIVer 0, it looks similar to this:
-	cols{0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{particle(s)}}s{{p}}>4<n{{lesson #}}s{{l}}>}
+    cols{0<n{{kanji}}s{{k}}>1<n{{reading(s)}}s{{r}}>2<n{{meaning}}s{{d}}>3<n{{particle(s)}}s{{p}}>4<n{{lesson #}}s{{l}}>}
 
 ====================
 EXAMPLE CJI FILE
