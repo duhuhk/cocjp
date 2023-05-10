@@ -90,58 +90,8 @@ document.querySelectorAll('.info-group > .ih').forEach(l => {
    */
 });
 
-/*
-Old script: would check each element clicked for minimizability
-Unused, but may be useful for allowing any element to minimize a parent - e.g. by applying a data-can-minimize attribute
-Alt., use above querySlectorAll
-
-window.addEventListener('click', e => {
-   let t = e.target;
-   // console.log(t.classList);
-   if(e.target.classList.includes('ih')){
-      
-   }
-});
-*/
-
-
-
-
-
-// Homepage - Rainbow Kintama
-let kntm = document.querySelector('#金玉');
-let kntmTimer;
-if(kntm){
-   kntm.setAttribute('data-rgb', JSON.stringify({r:0,g:0,b:0,t:0,s:0.015}));
-   
-   kntmTimer = window.requestAnimationFrame(kntmRinbu);
-}
-const kntmFade = {
-   r: {pi: 0},
-   g: {pi: (2/3) * Math.PI},
-   b: {pi: (4/3) * Math.PI},
-   lw: 100,
-   up: 210,
-   get mult(){
-      return this.up - this.lw;
-   },
-   twopi: 2 * Math.PI,
-};
-function kntmRinbu(){
-   let phase = JSON.parse(kntm.getAttribute('data-rgb'));
-   
-   let t = phase.t;
-   let s = phase.s;
-   
-   phase.r = kntmFade.mult * Math.sin(t + kntmFade.r.pi) + kntmFade.lw;
-   phase.g = kntmFade.mult * Math.sin(t + kntmFade.g.pi) + kntmFade.lw;
-   phase.b = kntmFade.mult * Math.sin(t + kntmFade.b.pi) + kntmFade.lw;
-   
-   t += s;
-   phase.t = t % kntmFade.twopi;
-   
-   kntm.setAttribute('data-rgb', JSON.stringify(phase));
-   kntm.style.color = `rgb(${phase.r},${phase.g},${phase.b})`;
-   
-   kntmTimer = window.requestAnimationFrame(kntmRinbu);
-}
+/*if(document.querySelector('#金玉') !== null){
+   let kntmScript = document.createElement('script');
+   kntmScript.src = 'https://duhuhk.github.io/cocjp/script/kintama.js'
+   document.body.appendChild(kntmScript);
+}*/

@@ -50,25 +50,28 @@
    /* v To prevent highlighting when minimizing */
    user-select: none;
 }
-/* Characters for minimizing：●○▾▸▼►▷ */
+/* Characters for minimizing：○●▾▸▼►▷◇◆ */
 .ih[data-is-minimized='true']::before{
-   content: '► ';
+   content: '+ ';
+   float: left;
+   min-width: 24px;
+   font-family: monospace;
+   font-weight: bold;
+   font-style: normal;
+   font-size: 2em;
+   vertical-align: top;
+   margin-top: calc(-2px - 0.25em);
+}
+.ih[data-is-minimized='false']::before{
+   content: '― ';
+   font-size: 2em;
+   min-width: 24px;
    float: left;
    font-family: monospace;
    font-weight: bold;
    font-style: normal;
    vertical-align: top;
-   font-size: 1.1em;
-   min-width: 16px;
-}
-.ih[data-is-minimized='false']::before{
-   content: '▼ ';
-   font-family: monospace;
-   font-weight: bold;
-   font-style: normal;
-   vertical-align: top;
-   font-size: 1.1em;
-   min-width: 16px;
+   margin-top: calc(-2px - 0.25em);
 }
 
 .info-body-header{
@@ -113,6 +116,13 @@
    border-bottom: 1px solid black;
    /*background-color: rgba(180,255,170,1);*/
    background-color: var(--color-i-nested-header);
+}
+.info-table-header::after{
+   content: '△▽▲▼';
+   font-size: 0.8em;
+   vertical-align: middle;
+   margin-left: 16px;
+   float: right;
 }
 
 .info-table-data{
