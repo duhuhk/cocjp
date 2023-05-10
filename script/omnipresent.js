@@ -48,7 +48,7 @@ document.querySelectorAll('.info-group > .ih').forEach(l => {
       let tog = minState == 'true' ? 'false' : 'true';
       l.setAttribute('data-is-minimized', tog);
       P.setAttribute('data-is-minimized', tog);
-      if(Number(P.getAttribute('data-full-size')) < P.scrollHeight){
+      if(Number(P.getAttribute('data-full-size')) != P.scrollHeight && tog == 'true'){
          P.setAttribute('data-full-size', P.scrollHeight);
       }
       if(tog == 'true'){
