@@ -46,25 +46,29 @@
    margin-bottom: 4px;
    padding: 5px;
    border-bottom: 1px solid black;
+   vertical-align: middle;
    /* v To prevent highlighting when minimizing */
    user-select: none;
 }
-/* Characters for minimizing：●○▾▸▼► */
+/* Characters for minimizing：●○▾▸▼►▷ */
 .ih[data-is-minimized='true']::before{
    content: '► ';
+   float: left;
    font-family: monospace;
    font-weight: bold;
    font-style: normal;
-   vertical-align: bottom;
+   vertical-align: top;
    font-size: 1.1em;
+   min-width: 16px;
 }
 .ih[data-is-minimized='false']::before{
    content: '▼ ';
    font-family: monospace;
    font-weight: bold;
    font-style: normal;
-   vertical-align: bottom;
+   vertical-align: top;
    font-size: 1.1em;
+   min-width: 16px;
 }
 
 .info-body-header{

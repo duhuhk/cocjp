@@ -21,6 +21,7 @@ document.querySelectorAll('.info-group > .ih').forEach(l => {
    if(l.getAttribute('data-is-minimized') === null){
       l.setAttribute('data-is-minimized', 'false');
    }
+   l.title = l.getAttribute('data-is-minimized') == 'true' ? 'Expand group' : 'Shrink group';
    let subsize0 = +getComputedStyle(l).getPropertyValue('border-bottom-width').split('px')[0];
    let subsize1 = +getComputedStyle(l).getPropertyValue('border-top-width').split('px')[0];
    let subsize2 = +getComputedStyle(l).getPropertyValue('padding-bottom').split('px')[0];
@@ -28,9 +29,9 @@ document.querySelectorAll('.info-group > .ih').forEach(l => {
    let subsize4 = +getComputedStyle(l).getPropertyValue('margin-bottom').split('px')[0];
    let subsize5 = +getComputedStyle(l).getPropertyValue('margin-top').split('px')[0];
    let subsize = [subsize0,subsize1,subsize2,subsize3,subsize4,subsize5].reduce((a,b) => a + b) / 2;
-   // v The -1 comes from covering the bottom border of the .ih element with the bottom border of the .info-group element
+   // v The 1 comes from covering the bottom border of the .ih element with the bottom border of the .info-group element
    l.setAttribute('data-minimizing-weight', subsize);
-   l.setAttribute('data-minimized-size', l.offsetHeight - subsize - 1);
+   l.setAttribute('data-minimized-size', l.offsetHeight - subsize - 2);
    if(p.getAttribute('data-is-minimized') === null){
       p.setAttribute('data-is-minimized', 'false');
    }
@@ -39,6 +40,9 @@ document.querySelectorAll('.info-group > .ih').forEach(l => {
    }
    
    l.addEventListener('click', e =>{
+      if(l.getAttribute('data-is-minimized') != 'true' && l.getAttribute('data-is-minimized') != 'false'){
+         return 'Minimizing is disabled for this element';
+      }
       let P = l.parentNode;
       let minState = l.getAttribute('data-is-minimized');
       let tog = minState == 'true' ? 'false' : 'true';
@@ -56,7 +60,7 @@ document.querySelectorAll('.info-group > .ih').forEach(l => {
          P.style.height = (P.getAttribute('data-full-size') - subsize) + 'px';
          P.style.overflow = 'auto';
       }
-      console.log(P.style.height.split('px')[0] - P.getAttribute('data-full-size'));
+      l.title = l.getAttribute('data-is-minimized') == 'true' ? 'Expand group' : 'Shrink group';
    });
    
    /*
